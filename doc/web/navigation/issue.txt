@@ -1,0 +1,40 @@
+> Qt 3.3.0 SuSe 9.0 rpms
+> Qt 3.0.5 generated .ui file
+>
+> uic produces erroneous C++ from a designer generated .ui file:
+>
+> Qt 3.0.5 (correct code)
+>
+> filetypeCB = new QComboBox( FALSE, Toolbar, "filetypeCB" );
+> filetypeCB->insertItem( trUtf8( "png" ) );
+> filetypeCB->insertItem( trUtf8( "bmp" ) );
+> filetypeCB->insertItem( trUtf8( "ppm" ) );
+> filetypeCB->insertItem( trUtf8( "xpm" ) );
+> QSpacerItem* spacer_3 = new QSpacerItem( 0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum );
+> QApplication::sendPostedEvents( Toolbar, QEvent::ChildInserted );
+> Toolbar->boxLayout()->addItem( spacer_3 );
+>
+> becomes in Qt 3.3.0:
+>
+> filetypeCB = new QComboBox( FALSE, Toolbar, "filetypeCB" );
+>  = new QSpacerItem( 0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum);
+> QApplication::sendPostedEvents( Toolbar, QEvent::ChildInserted );
+> Toolbar->boxLayout()->addItem(  );
+>
+> what is clearly inacceptable. spacer_3 is a generated identifier.
+> If I try to save the .ui file from Qt3.3,0 designer, uic produces the
+> yet known "duplicate 'const'" error.
+>
+> Micha
+
+Hello Micha,
+
+we are aware of this issue; upgrading to Qt 3.3.1 should address this
+problem.
+
+Regards,
+Volker
+
+--
+Volker Hilsheimer, Support Manager
+Trolltech AS, Waldemar Thranes gate 98, NO-0175 Oslo, Norway

@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual C++ Express 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "qwtplot3d-vs2008", "qwtplot3d-vc2008.vcproj", "{25E04C55-C6D9-3425-B9FF-0F2F5CE680E8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{25E04C55-C6D9-3425-B9FF-0F2F5CE680E8}.Debug|Win32.ActiveCfg = Debug|Win32
+		{25E04C55-C6D9-3425-B9FF-0F2F5CE680E8}.Debug|Win32.Build.0 = Debug|Win32
+		{25E04C55-C6D9-3425-B9FF-0F2F5CE680E8}.Release|Win32.ActiveCfg = Release|Win32
+		{25E04C55-C6D9-3425-B9FF-0F2F5CE680E8}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
