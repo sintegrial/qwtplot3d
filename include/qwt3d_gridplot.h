@@ -33,7 +33,9 @@ public slots:
 
 protected:  
     void createOpenGlData(const Plotlet& pl);
-    void drawEnrichment(const Plotlet& pl, Enrichment& p);
+	void processVertex(const Triple& vert1, const Triple& norm1, const Plotlet& pl, bool hl, bool& stripStarted);
+
+	void drawEnrichment(const Plotlet& pl, Enrichment& p);
 
     int resolution_p;
 

@@ -362,20 +362,16 @@ inline Triple normalizedcross(Triple const& u, Triple const& v)
 {
 	Triple n;
 
-  /* compute the cross product (u x v for right-handed [ccw]) */
-  n.x = u.y * v.z - u.z * v.y;
-  n.y = u.z * v.x - u.x * v.z;
-  n.z = u.x * v.y - u.y * v.x;
+	/* compute the cross product (u x v for right-handed [ccw]) */
+	n.x = u.y * v.z - u.z * v.y;
+	n.y = u.z * v.x - u.x * v.z;
+	n.z = u.x * v.y - u.y * v.x;
 
-  /* normalize */
-  double l = n.length();
-  if (l)
+	/* normalize */
+	double l = n.length();
+	if (l > 0)
 	{
 		n /= l;
-	}
-	else
-	{
-		n = Triple(0,0,0);
 	}
 	
 	return n;

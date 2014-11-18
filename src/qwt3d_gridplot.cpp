@@ -3,6 +3,9 @@
 #pragma warning ( disable : 4786 )
 #endif
 
+//#include <QtCore/QElapsedTimer>
+//#include <QDebug>
+
 #include "qwt3d_gridplot.h"
 #include "qwt3d_enrichment_std.h"
 
@@ -158,12 +161,16 @@ void GridPlot::readIn(GridData& gdata, double** data, unsigned int columns, unsi
 
             gdata_ij.x = minx + i*dx;
             gdata_ij.y = miny + j*dy;
-            gdata_ij.z = val;
 
-            if (val > tmax)
-                tmax = val;
-            if (val < tmin)
-                tmin = val;
+			gdata_ij.z = val;
+
+			if (!_isnan(val))
+			{
+				if (val > tmax)
+					tmax = val;
+				if (val < tmin)
+					tmin = val;
+			}
         }
     }
     ParallelEpiped hull =
@@ -186,60 +193,71 @@ void GridPlot::readIn(GridData& gdata, double** data, unsigned int columns, unsi
 
 void GridPlot::calcNormals(GridData& gdata)
 {
+	//QElapsedTimer timer;
+	//timer.start();
+
     unsigned int rows = gdata.rows();
     unsigned int columns = gdata.columns();
 
-    // normals
-    
+    // normals   
     Triple u, v, n;  // for cross product
-    Triple vert_ip1j;
-    Triple vert_ijp1;
-    Triple vert_im1j;
-    Triple vert_ijm1;
 
-    for (unsigned i = 0; i < columns; ++i)
+    for (unsigned i = 0; i != columns; ++i)
     {
-        for (unsigned j = 0; j < rows; ++j)
+        for (unsigned j = 0; j != rows; ++j)
         {
-            Triple& n = gdata.normals[i][j];
             n = Triple(0,0,0);
 
             const Triple& vert_ij = gdata.vertices[i][j];
 
+			if (_isnan(vert_ij.z))
+			{
+				//gdata.normals[i][j] = n;
+				continue;
+			}
+
             if (i<columns-1 && j<rows-1)
             {
-                vert_ip1j = gdata.vertices[i+1][j] - vert_ij;
-                vert_ijp1 = gdata.vertices[i][j+1] - vert_ij;
-                n += normalizedcross(vert_ip1j, vert_ijp1); // right hand system here !
-            }
-
-            if (i>0 && j>0)
-            {
-                vert_im1j = gdata.vertices[i-1][j] - vert_ij;
-                vert_ijm1 = gdata.vertices[i][j-1] - vert_ij;
-                n += normalizedcross(vert_im1j, vert_ijm1);
+                /*	get two vectors to cross */
+                u = gdata.vertices[i+1][j] - vert_ij;
+                v = gdata.vertices[i][j+1] - vert_ij;
+                /* get the normalized cross product */
+                n += normalizedcross(u,v); // right hand system here !
             }
 
             if (i>0 && j<rows-1)
             {
-                n += normalizedcross(vert_ijp1, vert_im1j);
+                u = gdata.vertices[i][j+1] - vert_ij;
+                v = gdata.vertices[i-1][j] - vert_ij;
+                n += normalizedcross(u,v);
+            }
+
+            if (i>0 && j>0)
+            {
+                u = gdata.vertices[i-1][j] - vert_ij;
+                v = gdata.vertices[i][j-1] - vert_ij;
+                n += normalizedcross(u,v);
             }
 
             if (i<columns-1 && j>0)
             {
-                n += normalizedcross(vert_ijm1, vert_ip1j);
+                u = gdata.vertices[i][j-1] - vert_ij;
+                v = gdata.vertices[i+1][j] - vert_ij;
+                n += normalizedcross(u,v);
             }
-
             n.normalize();
+
+            gdata.normals[i][j] = n;
         }
     }
+
+	//qDebug() << "GridPlot::calcNormals(): " << timer.elapsed();
 }
 
 
 void GridPlot::sewPeriodic(GridData& gdata)
 {
     // sewing
-
     Triple n;
 
     unsigned int columns = gdata.columns();
@@ -486,8 +504,8 @@ void GridPlot::createOpenGlData(const Plotlet& pl)
     GLStateBewarer sb2(GL_LINE_SMOOTH, app.smoothDataMesh());
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    int lastcol =  data.columns();
-    int lastrow =  data.rows();
+    int lastcol = data.columns();
+    int lastrow = data.rows();
 
     if (app.plotStyle() != WIREFRAME)
     {
@@ -502,40 +520,29 @@ void GridPlot::createOpenGlData(const Plotlet& pl)
 
         for (i = 0; i < lastcol - step; i += step)
         {
-            glBegin(GL_TRIANGLE_STRIP);
+			bool stripStarted = false;
 
             const Triple& norm1 = data.normals[i][0];
             const Triple& vert1 = data.vertices[i][0];
-
-            setColorFromVertex(pl, vert1, hl);
-            glNormal3d(norm1.x, norm1.y, norm1.z);
-            glVertex3d(vert1.x, vert1.y, vert1.z);
+			processVertex(vert1, norm1, pl, hl, stripStarted);
 
             const Triple& norm2 = data.normals[i+step][0];
             const Triple& vert2 = data.vertices[i+step][0];
-
-            setColorFromVertex(pl, vert2, hl);
-            glNormal3d(norm2.x, norm2.y, norm2.z);
-            glVertex3d(vert2.x, vert2.y, vert2.z);
+			processVertex(vert2, norm2, pl, hl, stripStarted);
 
             for (j = 0; j < lastrow - step; j += step)
             {
                 const Triple& norm1 = data.normals[i][j+step];
                 const Triple& vert1 = data.vertices[i][j+step];
-
-                setColorFromVertex(pl, vert1, hl);
-                glNormal3d(norm1.x, norm1.y, norm1.z);
-                glVertex3d(vert1.x, vert1.y, vert1.z);
+				processVertex(vert1, norm1, pl, hl, stripStarted);
 
                 const Triple& norm2 = data.normals[i+step][j+step];
                 const Triple& vert2 = data.vertices[i+step][j+step];
-
-                setColorFromVertex(pl, vert2, hl);
-                glNormal3d(norm2.x, norm2.y, norm2.z);
-                glVertex3d(vert2.x, vert2.y, vert2.z);
+				processVertex(vert2, norm2, pl, hl, stripStarted);
             }
 
-            glEnd();
+			if (stripStarted)
+				glEnd();
         }
     }
 
@@ -550,25 +557,29 @@ void GridPlot::createOpenGlData(const Plotlet& pl)
             for (i = 0; i < data.columns() - step; i += step)
             {
                 const Triple& vert1 = data.vertices[i][0];
-                glVertex3d(vert1.x, vert1.y, vert1.z);
+				if (!_isnan(vert1.z))
+					glVertex3d(vert1.x, vert1.y, vert1.z);
             }
 
             for (j = 0; j < data.rows() - step; j += step)
             {
                 const Triple& vert1 = data.vertices[i][j];
-                glVertex3d(vert1.x, vert1.y, vert1.z);
+				if (!_isnan(vert1.z))
+					glVertex3d(vert1.x, vert1.y, vert1.z);
             }
 
             for (; i >= 0; i -= step)
             {
                 const Triple& vert1 = data.vertices[i][j];
-                glVertex3d(vert1.x, vert1.y, vert1.z);
+				if (!_isnan(vert1.z))
+					glVertex3d(vert1.x, vert1.y, vert1.z);
             }
 
             for (; j >= 0; j -= step)
             {
                 const Triple& vert1 = data.vertices[0][j];
-                glVertex3d(vert1.x, vert1.y, vert1.z);
+				if (!_isnan(vert1.z))
+					glVertex3d(vert1.x, vert1.y, vert1.z);
             }
 
             glEnd();
@@ -581,7 +592,8 @@ void GridPlot::createOpenGlData(const Plotlet& pl)
             for (j = 0; j < data.rows(); j += step)
             {
                 const Triple& vert1 = data.vertices[i][j];
-                glVertex3d(vert1.x, vert1.y, vert1.z);
+				if (!_isnan(vert1.z))
+					glVertex3d(vert1.x, vert1.y, vert1.z);
             }
             glEnd();
         }
@@ -592,11 +604,33 @@ void GridPlot::createOpenGlData(const Plotlet& pl)
             for (i = 0; i < data.columns(); i += step)
             {
                 const Triple& vert1 = data.vertices[i][j];
-                glVertex3d(vert1.x, vert1.y, vert1.z);
+				if (!_isnan(vert1.z))
+					glVertex3d(vert1.x, vert1.y, vert1.z);
             }
             glEnd();
         }
     }
+}
+
+void GridPlot::processVertex(const Triple& vert1, const Triple& norm1, const Plotlet& pl, bool hl, bool& stripStarted)
+{
+	if (_isnan(vert1.z))
+	{
+		if (stripStarted){
+			stripStarted = false;
+			glEnd();
+		}
+	}
+	else{
+		if (!stripStarted){
+			stripStarted = true;
+			glBegin(GL_TRIANGLE_STRIP);
+		}
+
+		setColorFromVertex(pl, vert1, hl);
+		glNormal3d(norm1.x, norm1.y, norm1.z);
+		glVertex3d(vert1.x, vert1.y, vert1.z);
+	}
 }
 
 void GridPlot::drawEnrichment(const Plotlet& pl, Enrichment& p)
