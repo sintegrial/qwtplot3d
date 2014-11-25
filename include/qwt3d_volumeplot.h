@@ -29,6 +29,11 @@ struct Voxel
     {
     }
 
+	bool isValid() const
+	{
+		return !_isnan(x) && !_isnan(y) && !_isnan(z);
+	}
+
     float x,y,z;
     quint8 r,g,b,a;
 

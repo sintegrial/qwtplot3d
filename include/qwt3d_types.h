@@ -30,8 +30,8 @@ enum PLOTSTYLE
 	HIDDENLINE , //!< Hidden Line style
 	FILLED     , //!< Color filled polygons w/o edges 
 	FILLEDMESH , //!< Color filled polygons w/ separately colored edges
-  POINTS     , //!< User defined style (used by Enrichments)
-  USER         //!< User defined style (used by Enrichments)
+	POINTS     , //!< User defined style (used by Enrichments)
+	USER         //!< User defined style (used by Enrichments)
 };
 
 //! Shading style
@@ -54,7 +54,7 @@ enum SCALETYPE
 {
 	LINEARSCALE,//!< Linear scaling 
 	LOG10SCALE,	//!< Logarithmic scaling (base 10)
-  USERSCALE   //!< User-defined (for extensions)
+	USERSCALE   //!< User-defined (for extensions)
 };
 
 //! Plotting style for floor data (projections)
@@ -158,7 +158,7 @@ struct QWT3D_EXPORT Triple
 	//! Triple coordinates
 	double x,y,z; 
 
-	Triple& operator+=(Triple t)
+	Triple& operator+=(const Triple& t)
 	{
 		x += t.x;
 		y += t.y;
@@ -167,7 +167,7 @@ struct QWT3D_EXPORT Triple
 		return *this;
 	}
 	
-	Triple& operator-=(Triple t)
+	Triple& operator-=(const Triple& t)
 	{
 		x -= t.x;
 		y -= t.y;
@@ -175,6 +175,7 @@ struct QWT3D_EXPORT Triple
 
 		return *this;
 	}
+
 	Triple& operator*=(double d)
 	{
 		x *= d;
@@ -183,6 +184,7 @@ struct QWT3D_EXPORT Triple
 
 		return *this;
 	}
+
 	Triple& operator/=(double d)
 	{
 		x /= d;
@@ -191,7 +193,8 @@ struct QWT3D_EXPORT Triple
 
 		return *this;
 	}
-	Triple& operator*=(Triple t) // scale
+
+	Triple& operator*=(const Triple& t) // scale
 	{
 		x *= t.x;
 		y *= t.y;
@@ -200,12 +203,12 @@ struct QWT3D_EXPORT Triple
 		return *this;
 	}
 
-	bool operator!=(Triple t) const
+	bool operator!=(const Triple& t) const
 	{
 		return !isPracticallyZero(x,t.x) || !isPracticallyZero(y,t.y) || !isPracticallyZero(z,t.z);
 	}
 	
-	bool operator==(Triple t) const
+	bool operator==(const Triple& t) const
 	{
 		return !operator!=(t);
 	}
@@ -221,6 +224,29 @@ struct QWT3D_EXPORT Triple
 		double l = length();
 		if (l)
 			*this /= l;
+		else
+			reset();
+	}
+
+	//! \since 0.3.2
+	void crossProduct(Triple const& u, Triple const& v)
+	{
+		/* compute the cross product (u x v for right-handed [ccw]) */
+		x = u.y * v.z - u.z * v.y;
+		y = u.z * v.x - u.x * v.z;
+		z = u.x * v.y - u.y * v.x;
+	}
+
+	//! \since 0.3.2
+	bool isValid() const
+	{
+		return !_isnan(x) && !_isnan(y) && !_isnan(z);
+	}
+
+	//! \since 0.3.2
+	void reset()
+	{
+		x = y = z = 0.0;
 	}
 };
 
@@ -228,26 +254,32 @@ inline const Triple operator+(const Triple& t, const Triple& t2)
 {
 	return Triple(t) += t2;
 }
+
 inline const Triple operator-(const Triple& t, const Triple& t2)
 {
 	return Triple(t) -= t2;
 }
+
 inline const Triple operator*(double d, const Triple& t)
 {
 	return Triple(t) *= d;
 }
+
 inline const Triple operator*(const Triple& t, double d)
 {
 	return Triple(t) *= d;
 }
+
 inline const Triple operator/(double d, const Triple& t)
 {
 	return Triple(t) /= d;
 }
+
 inline const Triple operator/(const Triple& t, double d)
 {
 	return Triple(t) /= d;
 }
+
 inline const Triple operator*(const Triple& t, const Triple& t2)
 {
 	return Triple(t) *= t2;
@@ -344,9 +376,23 @@ struct QWT3D_EXPORT RGBA
 	RGBA()
 		: r(0), g(0), b(0), a(1)
 		{}
+	
 	RGBA(double rr, double gg, double bb, double aa = 1)
 		: r(rr), g(gg), b(bb), a(aa)
 		{}
+
+	//! \since 0.3.2
+	bool operator==(const RGBA& c)
+	{
+		return r == c.r && g == c.g && b == c.b && a == c.a;
+	}
+
+	//! \since 0.3.2
+	bool operator!=(const RGBA& c)
+	{
+		return !(*this == c);
+	}
+
 	double r,g,b,a;
 };
 
@@ -368,11 +414,7 @@ inline Triple normalizedcross(Triple const& u, Triple const& v)
 	n.z = u.x * v.y - u.y * v.x;
 
 	/* normalize */
-	double l = n.length();
-	if (l > 0)
-	{
-		n /= l;
-	}
+	n.normalize();
 	
 	return n;
 }

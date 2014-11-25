@@ -60,8 +60,8 @@ RGBA StandardColor::rgba(double, double, double z) const
         return RGBA(0.0,0.0,0.0);
 
     index = unsigned((colors_.size()-1) * fac);
-    if (index > colors_.size() - 1)
-        index = colors_.size() - 1;
+    if (index >= colors_.size())
+        index = colors_.size()-1;
 
     return colors_[index];
 }

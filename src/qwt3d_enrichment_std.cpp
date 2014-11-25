@@ -160,9 +160,12 @@ void Dot::drawEnd()
 
 void Dot::draw(Qwt3D::Triple const& pos)
 {
-    RGBA rgba = plot_p->dataColor()->rgba(pos);
-    glColor4d(rgba.r,rgba.g,rgba.b,rgba.a);
-    glVertex3d( pos.x, pos.y, pos.z);
+	if (!_isnan(pos.z))
+	{
+		RGBA rgba = plot_p->dataColor()->rgba(pos);
+		glColor4d(rgba.r,rgba.g,rgba.b,rgba.a);
+		glVertex3d(pos.x, pos.y, pos.z);
+	}
 }
 
 /////////////////////////////////////////////////////////////////
@@ -179,7 +182,7 @@ Ball::Ball()
 
 Ball::Ball(double rad, unsigned quality)
 {
-    sphere   = gluNewQuadric();
+    sphere = gluNewQuadric();
     configure(rad, quality);
 }
 

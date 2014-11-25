@@ -3,8 +3,8 @@
 #pragma warning ( disable : 4786 )
 #endif
 
-//#include <QtCore/QElapsedTimer>
-//#include <QDebug>
+#include <QtCore/QElapsedTimer>
+#include <QDebug>
 
 #include "qwt3d_gridplot.h"
 #include "qwt3d_enrichment_std.h"
@@ -61,14 +61,17 @@ GridPlot::GridPlot( QWidget * parent, const QGLWidget * shareWidget)
     plotlets_p[0].data = ValuePtr<Data>(new GridData);
 }
 
-void GridPlot::setColorFromVertex(const Plotlet& pl, const Triple& vertex, bool skip)
+void GridPlot::setColorFromVertex(const Plotlet& pl, const Triple& vertex, RGBA& lastColor, bool skip) const
 {
     if (skip)
         return;
 
     RGBA col = pl.appearance->dataColor()->rgba(vertex);
-    
-    glColor4d(col.r, col.g, col.b, col.a);
+	if (lastColor != col)
+	{ 
+		glColor4d(col.r, col.g, col.b, col.a);
+		lastColor = col;
+	}
 }
 
 void GridPlot::createNormals(const Plotlet& pl)
@@ -95,7 +98,7 @@ void GridPlot::createNormals(const Plotlet& pl)
         {
             norm = data.normals[i][j];//topv-basev;
             norm.normalize();
-            norm	*= diag;
+            norm *= diag;
 
             const Triple &vert = data.vertices[i][j];
             arrow.setTop(vert+norm);
@@ -108,16 +111,16 @@ void GridPlot::createNormals(const Plotlet& pl)
 
 void GridPlot::readIn(GridData& gdata, Triple** data, unsigned int columns, unsigned int rows)
 {
-    gdata.setSize(columns,rows);
+    gdata.setSize(columns, rows);
 
-    ParallelEpiped range(Triple(DBL_MAX,DBL_MAX,DBL_MAX),Triple(-DBL_MAX,-DBL_MAX,-DBL_MAX));
+    ParallelEpiped range(Triple(DBL_MAX,DBL_MAX,DBL_MAX), Triple(-DBL_MAX,-DBL_MAX,-DBL_MAX));
 
     /* fill out the vertex array for the mesh. */
     for (unsigned i = 0; i != columns; ++i)
     {
         for (unsigned j = 0; j != rows; ++j)
         {
-            Triple& val = data[i][j];
+            const Triple& val = data[i][j];
 
             gdata.vertices[i][j] = val;
 
@@ -125,22 +128,28 @@ void GridPlot::readIn(GridData& gdata, Triple** data, unsigned int columns, unsi
                 range.maxVertex.x = val.x;
             if (val.y > range.maxVertex.y)
                 range.maxVertex.y = val.y;
-            if (val.z > range.maxVertex.z)
-                range.maxVertex.z = val.z;
+
             if (val.x < range.minVertex.x)
                 range.minVertex.x = val.x;
             if (val.y < range.minVertex.y)
                 range.minVertex.y = val.y;
-            if (val.z < range.minVertex.z)
-                range.minVertex.z = val.z;
+
+			if (!_isnan(val.z))
+			{
+				if (val.z < range.minVertex.z)
+					range.minVertex.z = val.z;
+				if (val.z > range.maxVertex.z)
+					range.maxVertex.z = val.z;
+			}
         }
     }
+
     gdata.setHull(range);
 }
 
 
-void GridPlot::readIn(GridData& gdata, double** data, unsigned int columns, unsigned int rows
-                      , double minx, double maxx, double miny, double maxy)
+void GridPlot::readIn(GridData& gdata, double** data, unsigned int columns, unsigned int rows, 
+					  double minx, double maxx, double miny, double maxy)
 {
     gdata.setPeriodic(false,false);
     gdata.setSize(columns,rows);
@@ -157,11 +166,10 @@ void GridPlot::readIn(GridData& gdata, double** data, unsigned int columns, unsi
         for (unsigned j = 0; j != rows; ++j)
         {
             Triple& gdata_ij = gdata.vertices[i][j];
-            double& val = data[i][j];
+            const double& val = data[i][j];
 
             gdata_ij.x = minx + i*dx;
             gdata_ij.y = miny + j*dy;
-
 			gdata_ij.z = val;
 
 			if (!_isnan(val))
@@ -173,18 +181,19 @@ void GridPlot::readIn(GridData& gdata, double** data, unsigned int columns, unsi
 			}
         }
     }
+
     ParallelEpiped hull =
             ParallelEpiped(
                 Triple(
                     gdata.vertices[0][0].x,
-            gdata.vertices[0][0].y,
-            tmin
-            ),
-            Triple(
-                gdata.vertices[gdata.columns()-1][gdata.rows()-1].x,
-            gdata.vertices[gdata.columns()-1][gdata.rows()-1].y,
-            tmax
-            )
+					gdata.vertices[0][0].y,
+					tmin
+					),
+				Triple(
+					gdata.vertices[gdata.columns()-1][gdata.rows()-1].x,
+					gdata.vertices[gdata.columns()-1][gdata.rows()-1].y,
+					tmax
+					)
             );
 
     gdata.setHull(hull);
@@ -193,65 +202,84 @@ void GridPlot::readIn(GridData& gdata, double** data, unsigned int columns, unsi
 
 void GridPlot::calcNormals(GridData& gdata)
 {
-	//QElapsedTimer timer;
-	//timer.start();
-
     unsigned int rows = gdata.rows();
     unsigned int columns = gdata.columns();
 
-    // normals   
-    Triple u, v, n;  // for cross product
+    Triple u, v, c;  // for cross product
 
-    for (unsigned i = 0; i != columns; ++i)
+	// normals   
+    for (unsigned i = 0; i < columns; ++i)
     {
-        for (unsigned j = 0; j != rows; ++j)
+        for (unsigned j = 0; j < rows; ++j)
         {
-            n = Triple(0,0,0);
+			Triple& n = gdata.normals[i][j];
+			n.reset();
 
             const Triple& vert_ij = gdata.vertices[i][j];
-
 			if (_isnan(vert_ij.z))
 			{
-				//gdata.normals[i][j] = n;
 				continue;
 			}
 
             if (i<columns-1 && j<rows-1)
             {
-                /*	get two vectors to cross */
-                u = gdata.vertices[i+1][j] - vert_ij;
-                v = gdata.vertices[i][j+1] - vert_ij;
-                /* get the normalized cross product */
-                n += normalizedcross(u,v); // right hand system here !
+				const Triple& vert_ip1_j = gdata.vertices[i+1][j];
+				const Triple& vert_i_jp1 = gdata.vertices[i][j+1];
+
+				if (!_isnan(vert_i_jp1.z) && !_isnan(vert_i_jp1.z))
+				{
+					u = vert_ip1_j - vert_ij;
+					v = vert_i_jp1 - vert_ij;
+					c.crossProduct(u, v);
+					n += c; // right hand system here !
+				}
             }
 
             if (i>0 && j<rows-1)
             {
-                u = gdata.vertices[i][j+1] - vert_ij;
-                v = gdata.vertices[i-1][j] - vert_ij;
-                n += normalizedcross(u,v);
+				const Triple& vert_i_jp1 = gdata.vertices[i][j+1];
+				const Triple& vert_im1_j = gdata.vertices[i-1][j];
+
+				if (!_isnan(vert_i_jp1.z) && !_isnan(vert_im1_j.z))
+				{
+					u = vert_i_jp1 - vert_ij;
+					v = vert_im1_j - vert_ij;
+					c.crossProduct(u, v);
+					n += c;
+				}
             }
 
             if (i>0 && j>0)
             {
-                u = gdata.vertices[i-1][j] - vert_ij;
-                v = gdata.vertices[i][j-1] - vert_ij;
-                n += normalizedcross(u,v);
+				const Triple& vert_i_jm1 = gdata.vertices[i][j-1];
+				const Triple& vert_im1_j = gdata.vertices[i-1][j];
+
+				if (!_isnan(vert_im1_j.z) && !_isnan(vert_i_jm1.z))
+				{
+					u = vert_im1_j - vert_ij;
+					v = vert_i_jm1 - vert_ij;
+					c.crossProduct(u, v);
+					n += c;
+				}
             }
 
             if (i<columns-1 && j>0)
             {
-                u = gdata.vertices[i][j-1] - vert_ij;
-                v = gdata.vertices[i+1][j] - vert_ij;
-                n += normalizedcross(u,v);
-            }
-            n.normalize();
+				const Triple& vert_i_jm1 = gdata.vertices[i][j-1];
+				const Triple& vert_ip1_j = gdata.vertices[i+1][j];
 
-            gdata.normals[i][j] = n;
+				if (!_isnan(vert_i_jm1.z) && !_isnan(vert_ip1_j.z))
+				{
+					u = vert_i_jm1 - vert_ij;
+					v = vert_ip1_j - vert_ij;
+					c.crossProduct(u, v);
+					n += c;
+				}
+            }
+
+            n.normalize();
         }
     }
-
-	//qDebug() << "GridPlot::calcNormals(): " << timer.elapsed();
 }
 
 
@@ -329,11 +357,25 @@ int GridPlot::createDataset(double** data, unsigned int columns, unsigned int ro
     GridData& plotdata = dynamic_cast<GridData&>(*plotlets_p[ret].data);
     plotdata.setPeriodic(false,false);
     plotdata.setSize(columns,rows);
-    readIn(plotdata,data,columns,rows,minx,maxx,miny,maxy);
-    calcNormals(plotdata);
 
-    updateData();
-    updateNormals();
+	QElapsedTimer timer;
+	timer.start();
+
+    readIn(plotdata,data,columns,rows,minx,maxx,miny,maxy);
+
+	qDebug() << "GridPlot::readIn(): " << timer.elapsed();
+	timer.restart();
+
+	calcNormals(plotdata);
+
+	qDebug() << "GridPlot::calcNormals(): " << timer.elapsed();
+	timer.restart();
+
+	updateData();
+
+	qDebug() << "GridPlot::createDataset()" << timer.elapsed();
+
+	updateNormals();
     createCoordinateSystem();
 
     return ret;
@@ -346,6 +388,8 @@ void GridPlot::data2Floor(const Plotlet& pl)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glPolygonMode(GL_FRONT_AND_BACK, GL_QUADS);
 
+	RGBA lastColor;
+
     const GridData& data = dynamic_cast<const GridData&>(*pl.data);
     double zshift = data.hull().minVertex.z;
     for (int i = 0; i < data.columns() - step; i += step)
@@ -353,21 +397,21 @@ void GridPlot::data2Floor(const Plotlet& pl)
         glBegin(GL_TRIANGLE_STRIP);
 
         const Triple& vert1 = data.vertices[i][0];
-        setColorFromVertex(pl, vert1);
+        setColorFromVertex(pl, vert1, lastColor);
         glVertex3d(vert1.x, vert1.y, zshift);
 
         const Triple& vert2 = data.vertices[i+step][0];
-        setColorFromVertex(pl, vert2);
+        setColorFromVertex(pl, vert2, lastColor);
         glVertex3d(vert2.x, vert2.y, zshift);
 
         for (int j = 0; j < data.rows() - step; j += step)
         {
             const Triple& vert1 = data.vertices[i][j+step];
-            setColorFromVertex(pl, vert1);
+            setColorFromVertex(pl, vert1, lastColor);
             glVertex3d(vert1.x, vert1.y, zshift);
 
             const Triple& vert2 = data.vertices[i+step][j+step];
-            setColorFromVertex(pl, vert2);
+            setColorFromVertex(pl, vert2, lastColor);
             glVertex3d(vert2.x, vert2.y, zshift);
         }
 
@@ -466,6 +510,9 @@ void GridPlot::setResolution( int res )
 
 void GridPlot::createOpenGlData(const Plotlet& pl)
 {
+	//QElapsedTimer timer;
+	//timer.start();
+
     createFloorOpenGlData();
 
     const GridData& data = dynamic_cast<const GridData&>(*pl.data);
@@ -520,99 +567,98 @@ void GridPlot::createOpenGlData(const Plotlet& pl)
 
         for (i = 0; i < lastcol - step; i += step)
         {
-			bool stripStarted = false;
+			bool stripStarted = true;
+			glBegin(GL_TRIANGLE_STRIP);
 
             const Triple& norm1 = data.normals[i][0];
             const Triple& vert1 = data.vertices[i][0];
-			processVertex(vert1, norm1, pl, hl, stripStarted);
+			processVertex(vert1, norm1, pl, hl, stripStarted, col);
 
             const Triple& norm2 = data.normals[i+step][0];
             const Triple& vert2 = data.vertices[i+step][0];
-			processVertex(vert2, norm2, pl, hl, stripStarted);
+			processVertex(vert2, norm2, pl, hl, stripStarted, col);
 
             for (j = 0; j < lastrow - step; j += step)
             {
                 const Triple& norm1 = data.normals[i][j+step];
                 const Triple& vert1 = data.vertices[i][j+step];
-				processVertex(vert1, norm1, pl, hl, stripStarted);
+				processVertex(vert1, norm1, pl, hl, stripStarted, col);
 
                 const Triple& norm2 = data.normals[i+step][j+step];
                 const Triple& vert2 = data.vertices[i+step][j+step];
-				processVertex(vert2, norm2, pl, hl, stripStarted);
+				processVertex(vert2, norm2, pl, hl, stripStarted, col);
             }
 
-			if (stripStarted)
-				glEnd();
+			glEnd();
         }
     }
 
-    if (app.plotStyle() == FILLEDMESH || app.plotStyle() == WIREFRAME || app.plotStyle() == HIDDENLINE)
+	if (app.plotStyle() == FILLEDMESH || app.plotStyle() == WIREFRAME || app.plotStyle() == HIDDENLINE)
     {
         glColor4d(app.meshColor().r, app.meshColor().g, app.meshColor().b, app.meshColor().a);
 
         if (step < data.columns() && step < data.rows())
         {
-            glBegin(GL_LINE_LOOP);
+			bool stripStarted = true;
+			glBegin(GL_LINE_LOOP);
 
             for (i = 0; i < data.columns() - step; i += step)
             {
-                const Triple& vert1 = data.vertices[i][0];
-				if (!_isnan(vert1.z))
-					glVertex3d(vert1.x, vert1.y, vert1.z);
+				processLineLoopVertex(data.vertices[i][0], stripStarted);
             }
 
             for (j = 0; j < data.rows() - step; j += step)
             {
-                const Triple& vert1 = data.vertices[i][j];
-				if (!_isnan(vert1.z))
-					glVertex3d(vert1.x, vert1.y, vert1.z);
+				processLineLoopVertex(data.vertices[i][j], stripStarted);
             }
 
             for (; i >= 0; i -= step)
             {
-                const Triple& vert1 = data.vertices[i][j];
-				if (!_isnan(vert1.z))
-					glVertex3d(vert1.x, vert1.y, vert1.z);
+				processLineLoopVertex(data.vertices[i][j], stripStarted);
             }
 
             for (; j >= 0; j -= step)
             {
-                const Triple& vert1 = data.vertices[0][j];
-				if (!_isnan(vert1.z))
-					glVertex3d(vert1.x, vert1.y, vert1.z);
+				processLineLoopVertex(data.vertices[0][j], stripStarted);
             }
 
-            glEnd();
+			glEnd();
         }
 
         // weaving
         for (i = step; i < data.columns() - step; i += step)
         {
-            glBegin(GL_LINE_STRIP);
+			bool stripStarted = true;
+			glBegin(GL_LINE_STRIP);
+
             for (j = 0; j < data.rows(); j += step)
             {
-                const Triple& vert1 = data.vertices[i][j];
-				if (!_isnan(vert1.z))
-					glVertex3d(vert1.x, vert1.y, vert1.z);
+				processLineStripVertex(data.vertices[i][j], stripStarted);
             }
-            glEnd();
+
+			glEnd();
         }
 
         for (j = step; j < data.rows() - step; j += step)
         {
-            glBegin(GL_LINE_STRIP);
+			bool stripStarted = true;
+			glBegin(GL_LINE_STRIP);
+
             for (i = 0; i < data.columns(); i += step)
             {
-                const Triple& vert1 = data.vertices[i][j];
-				if (!_isnan(vert1.z))
-					glVertex3d(vert1.x, vert1.y, vert1.z);
+				processLineStripVertex(data.vertices[i][j], stripStarted);
             }
-            glEnd();
-        }
+
+			glEnd();
+		}		
     }
+
+	//qDebug() << "GridPlot::createOpenGlData(): " << timer.elapsed();
 }
 
-void GridPlot::processVertex(const Triple& vert1, const Triple& norm1, const Plotlet& pl, bool hl, bool& stripStarted)
+void GridPlot::processVertex(const Triple& vert1, const Triple& norm1, 
+							 const Plotlet& pl, bool hl, bool& stripStarted,
+							 RGBA& lastColor) const
 {
 	if (_isnan(vert1.z))
 	{
@@ -627,8 +673,46 @@ void GridPlot::processVertex(const Triple& vert1, const Triple& norm1, const Plo
 			glBegin(GL_TRIANGLE_STRIP);
 		}
 
-		setColorFromVertex(pl, vert1, hl);
+		setColorFromVertex(pl, vert1, lastColor, hl);
 		glNormal3d(norm1.x, norm1.y, norm1.z);
+		glVertex3d(vert1.x, vert1.y, vert1.z);
+	}
+}
+
+void GridPlot::processLineLoopVertex(const Triple& vert1, bool& stripStarted) const
+{
+	if (_isnan(vert1.z))
+	{
+		if (stripStarted){
+			stripStarted = false;
+			glEnd();
+		}
+	}
+	else{
+		if (!stripStarted){
+			stripStarted = true;
+			glBegin(GL_LINE_LOOP);
+		}
+
+		glVertex3d(vert1.x, vert1.y, vert1.z);
+	}
+}
+
+void GridPlot::processLineStripVertex(const Triple& vert1, bool& stripStarted) const
+{
+	if (_isnan(vert1.z))
+	{
+		if (stripStarted){
+			stripStarted = false;
+			glEnd();
+		}
+	}
+	else{
+		if (!stripStarted){
+			stripStarted = true;
+			glBegin(GL_LINE_STRIP);
+		}
+
 		glVertex3d(vert1.x, vert1.y, vert1.z);
 	}
 }
@@ -645,23 +729,26 @@ void GridPlot::drawEnrichment(const Plotlet& pl, Enrichment& p)
             ue->draw();
             ue->drawEnd();
         }
-        break;
-    case Enrichment::VERTEXENRICHMENT:
-    {
-        p.assign(*this);
-        VertexEnrichment* ve = (VertexEnrichment*)&p;
-        ve->drawBegin();
-        const GridData& data = dynamic_cast<const GridData&>(*pl.data);
-        int step = resolution();
-        for (int i = 0; i <= data.columns() - step; i += step)
-            for (int j = 0; j <= data.rows() - step; j += step)
-                ve->draw(data.vertices[i][j]);
-        ve->drawEnd();
-    }
-        break;
-    case Enrichment::EDGEENRICHMENT:
-        break;
-    default:
-        break; //todo
+			break;
+
+		case Enrichment::VERTEXENRICHMENT:
+		{
+			p.assign(*this);
+			VertexEnrichment* ve = (VertexEnrichment*)&p;
+			ve->drawBegin();
+			const GridData& data = dynamic_cast<const GridData&>(*pl.data);
+			int step = resolution();
+			for (int i = 0; i <= data.columns() - step; i += step)
+				for (int j = 0; j <= data.rows() - step; j += step)
+					ve->draw(data.vertices[i][j]);
+			ve->drawEnd();
+		}
+			break;
+
+		case Enrichment::EDGEENRICHMENT:
+			break;
+
+		default:
+			break; //todo
     }
 }

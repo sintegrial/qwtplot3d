@@ -31,8 +31,10 @@ public:
 
     void updateData(); //!< Recalculate data
 
+	Qwt3D::CoordinateSystem* coordinates() { return &coordinates_p; } //!< Returns pointer to CoordinateSystem object
+	//! \since 0.3.2
+	const Qwt3D::CoordinateSystem* coordinates() const { return &coordinates_p; } //!< Returns const pointer to CoordinateSystem object
     void createCoordinateSystem(Qwt3D::Triple beg, Qwt3D::Triple end);
-    Qwt3D::CoordinateSystem* coordinates() { return &coordinates_p; } //!< Returns pointer to CoordinateSystem object
     void setCoordinateStyle(Qwt3D::COORDSTYLE st); //!< Sets style of coordinate system.
 
     Qwt3D::ColorLegend* legend() { return &legend_;} //!< Returns pointer to ColorLegend object
@@ -58,7 +60,7 @@ public:
 
     //! Returns number of Plotlets
     unsigned plotlets() const {return plotlets_p.size();}
-    //! Returns false, if at leat one valid datset exists.
+    //! Returns false, if at least one valid dataset exists.
     inline bool hasData() const;
     //! Returns appearance for Plotlet at position idx
     inline Appearance& appearance(unsigned idx);
@@ -146,11 +148,11 @@ protected:
     quint64 m_createTime;
 
     /**
-  Utilized from createDataset members in inherited plot types.
-  Following different strategies (depending on append) in modifying the
-  Plotlet vector, the function assigns data of type DATA to
-  a Plotlets data member. It returns a reference to the new content and the
-  position in the Plotlet vector
+	  Utilized from createDataset members in inherited plot types.
+	  Following different strategies (depending on append) in modifying the
+	  Plotlet vector, the function assigns data of type DATA to
+	  a Plotlets data member. It returns a reference to the new content and the
+	  position in the Plotlet vector
   */
     template<typename DATA>
     int prepareDatasetCreation(bool append)

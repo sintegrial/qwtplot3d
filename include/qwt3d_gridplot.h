@@ -33,18 +33,21 @@ public slots:
 
 protected:  
     void createOpenGlData(const Plotlet& pl);
-	void processVertex(const Triple& vert1, const Triple& norm1, const Plotlet& pl, bool hl, bool& stripStarted);
+	void processVertex(const Triple& vert1, const Triple& norm1, const Plotlet& pl, bool hl, bool& stripStarted, RGBA& lastColor) const;
+	void processLineLoopVertex(const Triple& vert1, bool& stripStarted) const;
+	void processLineStripVertex(const Triple& vert1, bool& stripStarted) const;
 
 	void drawEnrichment(const Plotlet& pl, Enrichment& p);
 
     int resolution_p;
 
-private:
+protected:
+	//! class made protected to access grid data from inherited classes
     class GridData : public Data
     {
     public:
         GridData();
-        GridData(unsigned int columns, unsigned int rows);//!< see setSize()
+        GridData(unsigned int columns, unsigned int rows); //!< see setSize()
 
         GridData* clone() const {return new GridData(*this);}
 
@@ -68,7 +71,7 @@ private:
     void createNormals(const Plotlet& pl);
     void data2Floor(const Plotlet& pl);
     void isolines2Floor(const Plotlet& pl);
-    void setColorFromVertex(const Plotlet& pl, const Triple& vertex, bool skip = false);
+    void setColorFromVertex(const Plotlet& pl, const Triple& vertex, RGBA& lastColor, bool skip = false) const;
     void calcNormals(GridData& gdata);
     void sewPeriodic(GridData& gdata);
     void readIn(GridData& gdata, Triple** data, unsigned int columns, unsigned int rows);

@@ -524,7 +524,7 @@ void ExtGLWidget::setZoom( double val )
 }
 
 /*!
-  Set up ortogonal or perspective mode and updates widget
+  Set up orthogonal or perspective mode and updates widget
 */
 void ExtGLWidget::setOrtho( bool val )
 {

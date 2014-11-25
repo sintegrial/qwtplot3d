@@ -34,20 +34,22 @@ int VolumePlot::createDataset(const Voxel::Array &nodes, bool append)
     for (int i = 0; i < nodes.size(); ++i)
     {
         const Voxel& vert = nodes.at(i);
+		if (vert.isValid())
+		{
+			if (vert.x < hull.minVertex.x)
+				hull.minVertex.x = vert.x;
+			if (vert.y < hull.minVertex.y)
+				hull.minVertex.y = vert.y;
+			if (vert.z < hull.minVertex.z)
+				hull.minVertex.z = vert.z;
 
-        if (vert.x < hull.minVertex.x)
-            hull.minVertex.x = vert.x;
-        if (vert.y < hull.minVertex.y)
-            hull.minVertex.y = vert.y;
-        if (vert.z < hull.minVertex.z)
-            hull.minVertex.z = vert.z;
-
-        if (vert.x > hull.maxVertex.x)
-            hull.maxVertex.x = vert.x;
-        if (vert.y > hull.maxVertex.y)
-            hull.maxVertex.y = vert.y;
-        if (vert.z > hull.maxVertex.z)
-            hull.maxVertex.z = vert.z;
+			if (vert.x > hull.maxVertex.x)
+				hull.maxVertex.x = vert.x;
+			if (vert.y > hull.maxVertex.y)
+				hull.maxVertex.y = vert.y;
+			if (vert.z > hull.maxVertex.z)
+				hull.maxVertex.z = vert.z;
+		}
     }
 
     data.setHull(hull);
@@ -71,8 +73,11 @@ void VolumePlot::createOpenGlData(const Plot3D::Plotlet &pl)
     for (int i = 0; i < data.nodes.size(); ++i)
     {
         const Voxel& vert = data.nodes.at(i);
-        glColor4ub(vert.r, vert.g, vert.b, vert.a);
-        glVertex3f(vert.x, vert.y, vert.z);
+		if (vert.isValid())
+		{
+			glColor4ub(vert.r, vert.g, vert.b, vert.a);
+			glVertex3f(vert.x, vert.y, vert.z);
+		}
     }
 
     glEnd();
