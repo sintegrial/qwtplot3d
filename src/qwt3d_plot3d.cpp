@@ -1,6 +1,6 @@
 #if defined(_MSC_VER) /* MSVC Compiler */
-#pragma warning ( disable : 4305 )
-#pragma warning ( disable : 4786 )
+#pragma warning (disable : 4305)
+#pragma warning (disable : 4786)
 #endif
 
 #include "qwt3d_color_std.h"
@@ -11,7 +11,7 @@
 
 using namespace Qwt3D;
 
-Qwt3D::Plot3D::Plotlet::Plotlet( Data* d, const Appearance& a )
+Qwt3D::Plot3D::Plotlet::Plotlet(Data* d, const Appearance& a)
 {
     data = ValuePtr<Data>(d);
     appearance = ValuePtr<Appearance>(new Appearance(a));
@@ -20,8 +20,9 @@ Qwt3D::Plot3D::Plotlet::Plotlet( Data* d, const Appearance& a )
 /*!
   This should be the first call in your derived classes constructors.
 */
-Plot3D::Plot3D( QWidget * parent, const QGLWidget * shareWidget)
-    : ExtGLWidget( parent, shareWidget)
+Plot3D::Plot3D(QWidget * parent, const QGLWidget * shareWidget)
+    : ExtGLWidget(parent, shareWidget),
+	m_fastNormals(false)
 {  
     plotlets_p.push_back(Plotlet(0));
     renderpixmaprequest_ = false;
@@ -55,7 +56,7 @@ Plot3D::Plot3D( QWidget * parent, const QGLWidget * shareWidget)
 Plot3D::~Plot3D()
 {
     makeCurrent();
-    SaveGlDeleteLists( displaylists_p[0], displaylists_p.size() );
+    SaveGlDeleteLists(displaylists_p[0], displaylists_p.size());
 }
 
 void Plot3D::initializeGL()
@@ -88,13 +89,12 @@ void Plot3D::paintGL()
     glClearColor(bgcolor_.r, bgcolor_.g, bgcolor_.b, bgcolor_.a);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glMatrixMode( GL_MODELVIEW );
+    glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
-    applyLights();
 
-    glRotatef( -90, 1.0, 0.0, 0.0 );
-    glRotatef( 0.0, 0.0, 1.0, 0.0 );
-    glRotatef( 0.0, 0.0, 0.0, 1.0 );
+    glRotatef(-90, 1.0, 0.0, 0.0);
+    glRotatef(0.0, 0.0, 1.0, 0.0);
+    glRotatef(0.0, 0.0, 0.0, 1.0);
 
     if (displaylegend_)
     {
@@ -111,48 +111,47 @@ void Plot3D::paintGL()
 
     glLoadIdentity();
 
-    glRotatef( xRotation()-90, 1.0, 0.0, 0.0 );
-    glRotatef( yRotation(), 0.0, 1.0, 0.0 );
-    glRotatef( zRotation(), 0.0, 0.0, 1.0 );
+    glRotatef(xRotation()-90, 1.0, 0.0, 0.0);
+    glRotatef(yRotation(), 0.0, 1.0, 0.0);
+    glRotatef(zRotation(), 0.0, 0.0, 1.0);
 
-    glScalef( zoom() * xScale(), zoom() * yScale(), zoom() * zScale() );
+    glScalef(zoom() * xScale(), zoom() * yScale(), zoom() * zScale());
 
     glTranslatef(xShift()-center.x, yShift()-center.y, zShift()-center.z);
 
-    glMatrixMode( GL_PROJECTION );
+    glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
     if (beg != end)
     {
         if (ortho())
-            glOrtho( -radius, +radius, -radius, +radius, 0, 40 * radius);
+            glOrtho(-radius, +radius, -radius, +radius, 0, 40 * radius);
         else
-            glFrustum( -radius, +radius, -radius, +radius, 5 * radius, 400 * radius );
+            glFrustum(-radius, +radius, -radius, +radius, 5 * radius, 400 * radius);
     }
     else
     {
         if (ortho())
-            glOrtho( -1.0, 1.0, -1.0, 1.0, 10.0, 100.0 );
+            glOrtho(-1.0, 1.0, -1.0, 1.0, 10.0, 100.0);
         else
-            glFrustum( -1.0, 1.0, -1.0, 1.0, 10.0, 100.0 );
+            glFrustum(-1.0, 1.0, -1.0, 1.0, 10.0, 100.0);
     }
 
-    glTranslatef( xViewportShift() * 2 * radius , yViewportShift() * 2 * radius , -7 * radius );
+    glTranslatef(xViewportShift() * 2 * radius , yViewportShift() * 2 * radius , -7 * radius);
 
-    if (lightingEnabled())
+	applyLights();
+
+	if (lightingEnabled())
         glEnable(GL_NORMALIZE);
 
-    for (unsigned i=0; i!= displaylists_p.size(); ++i)
-    {
-        if (i!=LegendObject)
-            glCallList( displaylists_p[i] );
-    }
+	drawOpenGlData();
+
     coordinates_p.draw();
 
     if (lightingEnabled())
         glDisable(GL_NORMALIZE);
 
-    glMatrixMode( GL_MODELVIEW );
+    glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
 
 
@@ -170,9 +169,9 @@ void Plot3D::paintGL()
 /*!
   Set up the OpenGL view port
 */
-void Plot3D::resizeGL( int w, int h )
+void Plot3D::resizeGL(int w, int h)
 {
-    glViewport( 0, 0, w, h );
+    glViewport(0, 0, w, h);
     paintGL();
 }
 
@@ -195,7 +194,7 @@ void Plot3D::calculateHull()
 /*!
     Create a coordinate system with generating corners beg and end
 */
-void Plot3D::createCoordinateSystem( Triple beg, Triple end )
+void Plot3D::createCoordinateSystem(Triple beg, Triple end)
 {
     if (beg != coordinates_p.first() || end != coordinates_p.second())
         coordinates_p.init(beg, end);
@@ -215,7 +214,7 @@ void Plot3D::createCoordinateSystem()
 /*!
   Show a color legend
 */
-void Plot3D::showColorLegend( bool show, unsigned idx /* = 0 */ )
+void Plot3D::showColorLegend(bool show, unsigned idx /* = 0 */)
 {
     displaylegend_ = show;
 
@@ -240,7 +239,7 @@ void Plot3D::setBackgroundColor(RGBA rgba)
 /*!
     Assign a new coloring object for the data.
 */
-void Plot3D::setDataColor( const Qwt3D::Color& col )
+void Plot3D::setDataColor(const Qwt3D::Color& col)
 {
     appearance(0).setDataColor(col);
 }
@@ -258,7 +257,7 @@ void Plot3D::setCoordinateStyle(COORDSTYLE st)
   Set plotstyle for the standard plotting types. An argument of value Qwt3D::USER
   is ignored.
 */
-void Plot3D::setPlotStyle( PLOTSTYLE val )
+void Plot3D::setPlotStyle(PLOTSTYLE val)
 {
     appearance(0).setPlotStyle(val);
 }
@@ -266,7 +265,7 @@ void Plot3D::setPlotStyle( PLOTSTYLE val )
 /*!
   Set plotstyle to Qwt3D::USER and an associated enrichment object.
 */
-Qwt3D::Enrichment* Plot3D::setPlotStyle( Qwt3D::Enrichment const& obj )
+Qwt3D::Enrichment* Plot3D::setPlotStyle(Qwt3D::Enrichment const& obj)
 {
     return appearance(0).setPlotStyle(obj);
 }
@@ -274,7 +273,7 @@ Qwt3D::Enrichment* Plot3D::setPlotStyle( Qwt3D::Enrichment const& obj )
 /*!
   Set shading style
 */
-void Plot3D::setShading( SHADINGSTYLE val )
+void Plot3D::setShading(SHADINGSTYLE val)
 {
     appearance(0).setShading(val);
     updateGL();
@@ -284,12 +283,12 @@ void Plot3D::setShading( SHADINGSTYLE val )
   Set Polygon offset. The function affects the OpenGL rendering process.
     Try different values for surfaces with polygons only and with mesh and polygons
 */
-void Plot3D::setPolygonOffset( double val )
+void Plot3D::setPolygonOffset(double val)
 {
     appearance(0).setPolygonOffset(val);
 }
 
-void Plot3D::setMeshLineWidth( double val )
+void Plot3D::setMeshLineWidth(double val)
 {
     appearance(0).setMeshLineWidth(val);
 }
@@ -319,7 +318,7 @@ void Plot3D::setTitleFont(const QString& family, int pointSize, int weight, bool
 */
 void Plot3D::updateData()
 {
-    makeCurrent();
+	makeCurrent();
     GLStateBewarer dt(GL_DEPTH_TEST, true);
     GLStateBewarer ls(GL_LINE_SMOOTH, true);
 
@@ -358,8 +357,17 @@ void Qwt3D::Plot3D::createOpenGlData()
 {
     for (unsigned i=0; i!= plotlets_p.size(); ++i)
     {
-        this->createOpenGlData(plotlets_p[i]);
+       this->createOpenGlData(plotlets_p[i]);
     }
+}
+
+void Qwt3D::Plot3D::drawOpenGlData()
+{
+	for (unsigned i=0; i!= displaylists_p.size(); ++i)
+	{
+		if (i!=LegendObject)
+			glCallList(displaylists_p[i]);
+	}
 }
 
 /**

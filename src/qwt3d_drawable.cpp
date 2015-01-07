@@ -4,7 +4,7 @@ using namespace Qwt3D;
 
 Drawable::~Drawable()
 {
-  detachAll();
+	detachAll();
 }
 
 void Drawable::saveGLState()
@@ -30,7 +30,7 @@ void Drawable::restoreGLState()
 {
 	Enable(GL_LINE_SMOOTH, ls);
 	Enable(GL_POLYGON_SMOOTH, pols);
-	
+
 	setLineWidth(lw);
 	glBlendFunc(blsrc, bldst);
 	glColor4dv(col);
@@ -50,7 +50,7 @@ void Drawable::Enable(GLenum what, GLboolean val)
 {
 	if (val)
 		glEnable(what);
-  else
+	else
 		glDisable(what);
 }
 
@@ -66,12 +66,13 @@ void Drawable::attach(Drawable* dr)
 void Drawable::detach(Drawable* dr)
 {
 	std::list<Drawable*>::iterator it = std::find(dlist.begin(), dlist.end(), dr);
-	
+
 	if ( it != dlist.end() )
 	{
 		dlist.erase(it);
 	}
 }
+
 void Drawable::detachAll()
 {
 	dlist.clear();
@@ -84,8 +85,8 @@ void Drawable::detachAll()
 */
 Triple Drawable::ViewPort2World(Triple win, bool* err)
 {
-  Triple obj;
-	
+	Triple obj;
+
 	getMatrices(modelMatrix, projMatrix, viewport);
 	int res = gluUnProject(win.x, win.y, win.z, modelMatrix, projMatrix, viewport, &obj.x, &obj.y, &obj.z);
 
@@ -100,8 +101,8 @@ Triple Drawable::ViewPort2World(Triple win, bool* err)
 */
 Triple Drawable::World2ViewPort(Triple obj,	bool* err)
 {
-  Triple win;
-	
+	Triple win;
+
 	getMatrices(modelMatrix, projMatrix, viewport);
 	int res = gluProject(obj.x, obj.y, obj.z, modelMatrix, projMatrix, viewport, &win.x, &win.y, &win.z);
 
