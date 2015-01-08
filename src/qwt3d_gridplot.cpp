@@ -665,6 +665,8 @@ void GridPlot::createOpenGlData(const Plotlet& pl)
 	//QElapsedTimer timer;
 	//timer.start();
 
+	m_useThreads = false;
+
     createFloorOpenGlData();
 
     const GridData& data = dynamic_cast<const GridData&>(*pl.data);
@@ -757,6 +759,8 @@ void GridPlot::createOpenGlData(const Plotlet& pl)
 		}
 		else // new glDrawArrays-based render
 		{
+			m_useThreads = true;
+
 			int length = lastrow / m_threadsCount;
 			int r = 0;
 
@@ -836,9 +840,12 @@ void GridPlot::createOpenGlData(const Plotlet& pl)
 
 
 	// wait while threads are done
-	for (int i = 0; i < m_threadsCount; i++)
+	if (m_useThreads)
 	{
-		while (m_workers[i].isRunning());
+		for (int i = 0; i < m_threadsCount; i++)
+		{
+			while (m_workers[i].isRunning());
+		}
 	}
 	
 	//qDebug() << "GridPlot::createOpenGlData(): " << timer.elapsed();
@@ -846,15 +853,15 @@ void GridPlot::createOpenGlData(const Plotlet& pl)
 
 void GridPlot::drawOpenGlData()
 {
-	SurfacePlot::drawOpenGlData();
-
-	if (m_threadsCount > 0)
+	if (m_useThreads)
 	{
 		for (int i = 0; i < m_threadsCount; i++)
 		{
 			m_workers[i].paintGL();
 		}
 	}
+
+	SurfacePlot::drawOpenGlData();
 }
 
 void GridPlot::setRenderThreadsCount(int count)
@@ -884,8 +891,7 @@ void GridPlot::processVertex(const Triple& vert1, const Triple& norm1,
 
 		setColorFromVertex(colorData, vert1, lastColor, hl);
 
-		if (!m_fastNormals)
-			glNormal3d(norm1.x, norm1.y, norm1.z);
+		glNormal3d(norm1.x, norm1.y, norm1.z);
 
 		glVertex3d(vert1.x, vert1.y, vert1.z);
 	}
