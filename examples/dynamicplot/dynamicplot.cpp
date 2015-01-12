@@ -5,15 +5,19 @@
 //-----------------------------------------------------------------
 
 #include <math.h>
+#include <limits>
+
 #include <QApplication>
 #include <QElapsedTimer>
 
 #include "dynamicplot.h"
 
-
 Plot::Plot()
 {
 	//setTitle("Dynamic Plotter Demonstration");
+
+    setRenderThreadsCount(2);
+    enableFastNormals(true);
 
 	// fill initial data
 	for (int i = 0; i < Width1; i++)
@@ -27,11 +31,20 @@ Plot::Plot()
 			data[i][j] = xval;
 
 			xval += rand() % 3 - 1;
+
+			if (rand() % 5 == 1)
+				data[i][j] = std::numeric_limits<double>::quiet_NaN();
 		}
 	}
 
 	setRotation(50, 0, -15);
 	setZoom(1);
+
+	setPlotStyle(Qwt3D::FILLED);
+	//setPlotStyle(Qwt3D::FILLEDMESH);
+	//setPlotStyle(Qwt3D::WIREFRAME);
+	//setPlotStyle(Qwt3D::HIDDENLINE);
+
 
 	for (unsigned i=0; i!=coordinates()->axes.size(); ++i)
 	{
@@ -42,7 +55,6 @@ Plot::Plot()
 	coordinates()->axes[X1].setLabelString("x-axis");
 	coordinates()->axes[Y1].setLabelString("y-axis");
 	//coordinates()->axes[Z1].setLabelString(QChar(0x38f)); // Omega - see http://www.unicode.org/charts/
-
 
 	setCoordinateStyle(BOX);
 
@@ -69,6 +81,9 @@ void Plot::UpdateData()
 		data[i][Width2-1] = xval;
 
 		xval += rand() % 3 - 1;
+
+        if (rand() % 5 == 1)
+            data[i][Width2-1] = std::numeric_limits<double>::quiet_NaN();
 	}
 
 	QElapsedTimer tim;
@@ -77,12 +92,11 @@ void Plot::UpdateData()
 	// update dataset
 	createDataset(data, Width1, Width2, 0, Width1, 0, Width2);
 
+    updateGL();
+
 	qint64 rate = tim.elapsed();
 
     setTitle(QString("Dynamic Plotter Demonstration - Frame Time %1 ms").arg(rate));
-
-    //updateData();
-	updateGL();
 }
 
 int main(int argc, char **argv)

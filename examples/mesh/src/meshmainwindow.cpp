@@ -110,6 +110,7 @@ MeshMainWindow::MeshMainWindow( QWidget* parent )
   dataWidget = new GridPlot(frame);
   grid->addWidget( dataWidget, 0, 0 );
 
+  dataWidget->setRenderThreadsCount(2);
 
 	connect( coord, SIGNAL( triggered( QAction* ) ), this, SLOT( pickCoordSystem( QAction* ) ) );
 	connect( plotstyle, SIGNAL( triggered( QAction* ) ), this, SLOT( pickPlotStyle( QAction* ) ) );

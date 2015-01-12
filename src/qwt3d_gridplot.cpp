@@ -60,22 +60,27 @@ void GridPlot::GridData::setSize(unsigned int columns, unsigned int rows)
 GridPlot::CVertexProcessor::CVertexProcessor()
 {
 	m_step = 1;
-	m_colorize = false;
+	m_useColorMap = false;
 	m_colorData = NULL;
 	m_dataWidth = m_dataLength = 0;
 	m_data = NULL;
 }
 
 void GridPlot::CVertexProcessor::setup(int dataWidth, int dataLength, const GridPlot::GridData& data, int row, int step,
-									   bool colorize, const Color* colorData)
+									   bool useColorMap, const Qwt3D::RGBA& fixedColor, const Color* colorData,
+									   bool showMesh, const Qwt3D::RGBA& meshColor)
 {
 	m_dataWidth = dataWidth;
 	m_dataLength = dataLength;
 	m_data = &data;
 	m_row = row;
 	m_step = step;
-	m_colorize = (colorize && colorData != NULL);
+	m_useColorMap = useColorMap;
+	m_drawFill = (useColorMap && colorData != NULL) || !useColorMap;
 	m_colorData = colorData;
+	m_fixedColor = fixedColor;
+	m_drawMesh = showMesh;
+	m_meshColor = meshColor;
 }
 
 void GridPlot::CVertexProcessor::run()
@@ -86,29 +91,69 @@ void GridPlot::CVertexProcessor::run()
 	m_draw_colors.clear();
 	m_drawList.clear();
 
-	// reserve() gives up to 10% speedup
-	m_draw_normals.reserve(m_dataLength*m_dataWidth*2);
-	m_draw_vertices.reserve(m_dataLength*m_dataWidth*2);
-	m_draw_colors.reserve(m_dataLength*m_dataWidth*2);
-	m_drawList.reserve(m_dataLength*m_dataWidth*2);
-
-	int index = 0;
-	int size = 0;
-
-	for (int r = m_row; r < m_row + m_dataLength; r += m_step)
+	if (m_drawFill)
 	{
-		bool stripStarted = true;
+		// reserve() gives up to 10% speedup
+		m_draw_normals.reserve(m_dataLength*m_dataWidth*2);
+		m_draw_vertices.reserve(m_dataLength*m_dataWidth*2);
+		m_draw_colors.reserve(m_dataLength*m_dataWidth*2);
+		m_drawList.reserve(m_dataLength*m_dataWidth*2);
 
-		processVertex(stripStarted, r, 0, index, size);
-		processVertex(stripStarted, r+m_step, 0, index, size);
+		int index = 0;
+		int size = 0;
 
-		for (int c = 1; c < m_dataWidth-m_step; c += m_step)
+		for (int r = m_row; r < m_row + m_dataLength + 1 - m_step; r += m_step)
 		{
-			processVertex(stripStarted, r, c, index, size);
-			processVertex(stripStarted, r+m_step, c, index, size);
-		}
+			bool stripStarted = true;
 
-		endVertex(index, size);
+			processVertex(stripStarted, r, 0, index, size);
+			processVertex(stripStarted, r+m_step, 0, index, size);
+
+			for (int c = m_step; c < m_dataWidth + 1 - m_step; c += m_step)
+			{
+				processVertex(stripStarted, r, c, index, size);
+				processVertex(stripStarted, r+m_step, c, index, size);
+			}
+
+			endVertex(index, size);
+		}
+	}
+
+	// prepare mesh arrays
+	m_mesh_vertices.clear();
+	m_mesh_colors.clear();
+	m_drawMeshList.clear();
+	
+	if (m_drawMesh)
+	{
+		int index = 0;
+		int size = 0;
+
+		int i, j;
+
+        for (i = m_step; i < m_dataWidth; i += m_step)
+        {
+			bool stripStarted = true;
+
+            for (j = 0; j < m_row + m_dataLength; j += m_step)
+            {
+				processLineStripVertex(stripStarted, j, i, index, size);
+            }
+
+			endLineVertex(index, size);
+        }
+
+        for (j = m_step; j < m_row + m_dataLength; j += m_step)
+        {
+			bool stripStarted = true;
+
+            for (i = 0; i < m_dataWidth; i += m_step)
+            {
+				processLineStripVertex(stripStarted, j, i, index, size);
+            }
+
+			endLineVertex(index, size);
+		}			
 	}
 }
 
@@ -131,13 +176,16 @@ void GridPlot::CVertexProcessor::processVertex(bool& stripStarted, int i, int j,
 		m_draw_vertices.push_back(v);
 		m_draw_normals.push_back(m_data->normals[j][i]);
 
-		if (m_colorize)
+		if (m_useColorMap){
 			m_draw_colors.push_back(m_colorData->rgba(v));
+		}
+		else{
+			m_draw_colors.push_back(m_fixedColor);
+		}
 
 		size++;
 	}
 }
-
 
 void GridPlot::CVertexProcessor::endVertex(int& index, int& size)
 {
@@ -150,34 +198,68 @@ void GridPlot::CVertexProcessor::endVertex(int& index, int& size)
 	size = 0;
 }
 
+void GridPlot::CVertexProcessor::processLineStripVertex(bool& stripStarted, int i, int j, int& index, int& size)
+{
+	const Triple& v = m_data->vertices[j][i];
+
+	if (_isnan(v.z))
+	{
+		if (stripStarted){
+			stripStarted = false;
+			endLineVertex(index, size);
+		}
+	}
+	else{
+		if (!stripStarted){
+			stripStarted = true;
+		}
+
+		m_mesh_vertices.push_back(v);
+
+		m_mesh_colors.push_back(m_meshColor);
+
+		size++;
+	}
+}
+
+void GridPlot::CVertexProcessor::endLineVertex(int& index, int& size)
+{
+	if (size > 2){
+		m_drawMeshList.push_back(QPair<int,int>(index, size));
+	}
+
+	// next available index
+	index = m_mesh_vertices.size();
+	size = 0;
+}
 
 void GridPlot::CVertexProcessor::paintGL()
 {
-	if (m_draw_vertices.empty())
-		return;
-
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_NORMAL_ARRAY);
-
-	glVertexPointer(3, GL_DOUBLE, 0, &m_draw_vertices[0]);
-	glNormalPointer(GL_DOUBLE, 0, &m_draw_normals[0]);
-
-	if (m_colorize)
+ 	if (!m_draw_vertices.empty())
 	{
-		glEnableClientState(GL_COLOR_ARRAY);
+		glVertexPointer(3, GL_DOUBLE, 0, &m_draw_vertices[0]);
+		glNormalPointer(GL_DOUBLE, 0, &m_draw_normals[0]);
 		glColorPointer(4, GL_DOUBLE, 0, &m_draw_colors[0]);
+
+		for (unsigned int i = 0; i < m_drawList.size(); i++)
+		{
+			const QPair<int,int>& p = m_drawList.at(i);
+			glDrawArrays(GL_TRIANGLE_STRIP, p.first, p.second);
+		}
 	}
 
-	for (int i = 0; i < m_drawList.size(); i++){
-		const QPair<int,int>& p = m_drawList.at(i);
-		glDrawArrays(GL_TRIANGLE_STRIP, p.first, p.second);
+	// mesh
+	if (!m_drawMeshList.empty())
+	{
+		glVertexPointer(3, GL_DOUBLE, 0, &m_mesh_vertices[0]);
+		glColorPointer(4, GL_DOUBLE, 0, &m_mesh_colors[0]);
+
+		for (unsigned int i = 0; i < m_drawMeshList.size(); i++)
+		{
+			const QPair<int,int>& p = m_drawMeshList.at(i);
+			glDrawArrays(GL_LINE_STRIP, p.first, p.second);
+		}
 	}
-
-	if (m_colorize)
-		glDisableClientState(GL_COLOR_ARRAY);
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_NORMAL_ARRAY);
-
 }
 
 
@@ -188,7 +270,8 @@ void GridPlot::CVertexProcessor::paintGL()
 */
 GridPlot::GridPlot(QWidget* parent, const QGLWidget* shareWidget)
     : SurfacePlot(parent, shareWidget),
-	m_threadsCount(8)
+	m_threadsCount(0),
+	m_useThreads(false)
 {
     resolution_p = 1;
     plotlets_p[0].data = ValuePtr<Data>(new GridData);
@@ -509,22 +592,22 @@ int GridPlot::createDataset(double** data, unsigned int columns, unsigned int ro
     plotdata.setPeriodic(false,false);
     plotdata.setSize(columns,rows);
 
-	QElapsedTimer timer;
-	timer.start();
+//	QElapsedTimer timer;
+//	timer.start();
 
     readIn(plotdata,data,columns,rows,minx,maxx,miny,maxy);
 
-	qDebug() << "GridPlot::readIn(): " << timer.elapsed();
-	timer.restart();
+//	qDebug() << "GridPlot::readIn(): " << timer.elapsed();
+//	timer.restart();
 
 	calcNormals(plotdata);
 
-	qDebug() << "GridPlot::calcNormals(): " << timer.elapsed();
-	timer.restart();
+//	qDebug() << "GridPlot::calcNormals(): " << timer.elapsed();
+//	timer.restart();
 
 	updateData();
 
-	qDebug() << "GridPlot::createDataset()" << timer.elapsed();
+//	qDebug() << "GridPlot::createDataset()" << timer.elapsed();
 
 	updateNormals();
     createCoordinateSystem();
@@ -684,7 +767,7 @@ void GridPlot::createOpenGlData(const Plotlet& pl)
     int step = resolution();
 
 	Color& colorData = *(pl.appearance->dataColor());
-    RGBA col;
+    RGBA col = backgroundRGBAColor();
 
     if (app.plotStyle() == Qwt3D::POINTS)
     {
@@ -701,8 +784,8 @@ void GridPlot::createOpenGlData(const Plotlet& pl)
 
     setLineWidth(app.meshLineWidth());
 
-    GLStateBewarer sb(GL_POLYGON_OFFSET_FILL,true);
-    glPolygonOffset(app.polygonOffset(),1.0);
+    GLStateBewarer sb(GL_POLYGON_OFFSET_FILL, true);
+    glPolygonOffset(app.polygonOffset(), 1.0);
 
     GLStateBewarer sb2(GL_LINE_SMOOTH, app.smoothDataMesh());
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -710,27 +793,21 @@ void GridPlot::createOpenGlData(const Plotlet& pl)
     int lastcol = data.columns();
     int lastrow = data.rows();
 
-	if (m_fastNormals)
+	bool drawMesh = (app.plotStyle() == FILLEDMESH || app.plotStyle() == WIREFRAME || app.plotStyle() == HIDDENLINE);
+	bool drawFill = (app.plotStyle() != WIREFRAME);
+    bool hl = (app.plotStyle() == HIDDENLINE);
+
+	// older list-based render
+	if (m_threadsCount <= 0)
 	{
-		// default normals for the whole grid
-		glNormal3d(0,0,1);
-	}
-
-    if (app.plotStyle() != WIREFRAME)
-    {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_QUADS);
-
-        bool hl = (app.plotStyle() == HIDDENLINE);
-        if (hl)
-        {
-            col = backgroundRGBAColor();
-            glColor4d(col.r, col.g, col.b, col.a);
-        }
-
-		// older list-based render
-		if (m_threadsCount <= 0)
+		if (drawFill)
 		{
-			for (i = 0; i < lastcol - step; i += step)
+	        glPolygonMode(GL_FRONT_AND_BACK, GL_QUADS);
+	
+			if (hl)
+				glColor4d(col.r, col.g, col.b, col.a);
+
+            for (i = 0; i < lastcol - step; i += step)
 			{
 				bool stripStarted = true;
 				glBegin(GL_TRIANGLE_STRIP);
@@ -757,97 +834,91 @@ void GridPlot::createOpenGlData(const Plotlet& pl)
 				glEnd();
 			}
 		}
-		else // new glDrawArrays-based render
+
+		if (drawMesh)
 		{
-			m_useThreads = true;
+			glColor4d(app.meshColor().r, app.meshColor().g, app.meshColor().b, app.meshColor().a);
 
-			int length = lastrow / m_threadsCount;
-			int r = 0;
-
-			for (int i = 0; i < m_threadsCount; i++)
+			if (step < data.columns() && step < data.rows())
 			{
-				// if last one
-				if (i == m_threadsCount-1)
-					length += lastrow - (length * m_threadsCount) - 1;
+				bool stripStarted = true;
+				glBegin(GL_LINE_LOOP);
 
-				m_workers[i].setup(lastcol, length, data, r, step, !hl, &colorData);
-				m_workers[i].start(QThread::HighPriority);
+				for (i = 0; i < data.columns() - step; i += step)
+				{
+					processLineLoopVertex(data.vertices[i][0], stripStarted);
+				}
 
-				r += length;
+				for (j = 0; j < data.rows() - step; j += step)
+				{
+					processLineLoopVertex(data.vertices[i][j], stripStarted);
+				}
+
+				for (; i >= 0; i -= step)
+				{
+					processLineLoopVertex(data.vertices[i][j], stripStarted);
+				}
+
+				for (; j >= 0; j -= step)
+				{
+					processLineLoopVertex(data.vertices[0][j], stripStarted);
+				}
+
+				glEnd();
 			}
-		}
-    }
 
-	if (app.plotStyle() == FILLEDMESH || app.plotStyle() == WIREFRAME || app.plotStyle() == HIDDENLINE)
-    {
-        glColor4d(app.meshColor().r, app.meshColor().g, app.meshColor().b, app.meshColor().a);
+			// weaving
+			for (i = step; i < data.columns() - step; i += step)
+			{
+				bool stripStarted = true;
+				glBegin(GL_LINE_STRIP);
 
-        if (step < data.columns() && step < data.rows())
-        {
-			bool stripStarted = true;
-			glBegin(GL_LINE_LOOP);
+				for (j = 0; j < data.rows(); j += step)
+				{
+					processLineStripVertex(data.vertices[i][j], stripStarted);
+				}
 
-            for (i = 0; i < data.columns() - step; i += step)
-            {
-				processLineLoopVertex(data.vertices[i][0], stripStarted);
-            }
+				glEnd();
+			}
 
-            for (j = 0; j < data.rows() - step; j += step)
-            {
-				processLineLoopVertex(data.vertices[i][j], stripStarted);
-            }
+			for (j = step; j < data.rows() - step; j += step)
+			{
+				bool stripStarted = true;
+				glBegin(GL_LINE_STRIP);
 
-            for (; i >= 0; i -= step)
-            {
-				processLineLoopVertex(data.vertices[i][j], stripStarted);
-            }
+				for (i = 0; i < data.columns(); i += step)
+				{
+					processLineStripVertex(data.vertices[i][j], stripStarted);
+				}
 
-            for (; j >= 0; j -= step)
-            {
-				processLineLoopVertex(data.vertices[0][j], stripStarted);
-            }
-
-			glEnd();
-        }
-
-        // weaving
-        for (i = step; i < data.columns() - step; i += step)
-        {
-			bool stripStarted = true;
-			glBegin(GL_LINE_STRIP);
-
-            for (j = 0; j < data.rows(); j += step)
-            {
-				processLineStripVertex(data.vertices[i][j], stripStarted);
-            }
-
-			glEnd();
-        }
-
-        for (j = step; j < data.rows() - step; j += step)
-        {
-			bool stripStarted = true;
-			glBegin(GL_LINE_STRIP);
-
-            for (i = 0; i < data.columns(); i += step)
-            {
-				processLineStripVertex(data.vertices[i][j], stripStarted);
-            }
-
-			glEnd();
-		}		
-    }
-
-
-	// wait while threads are done
-	if (m_useThreads)
-	{
-		for (int i = 0; i < m_threadsCount; i++)
-		{
-			while (m_workers[i].isRunning());
+				glEnd();
+			}		
 		}
 	}
-	
+	else // new glDrawArrays-based render
+	{
+		m_useThreads = true;
+
+		int length = lastrow / m_threadsCount;
+		int r = 0;
+
+		for (int i = 0; i < m_threadsCount; i++)
+		{
+			// if last one
+			if (i == m_threadsCount-1)
+				length += lastrow - (length * m_threadsCount) - 1;
+
+			m_workers[i].setup(lastcol, length, data, r, step, 
+				!hl, col, drawFill ? &colorData : NULL, 
+				drawMesh, app.meshColor());
+
+			m_workers[i].start(QThread::HighPriority);
+
+			r += length;
+		}
+	}
+
+
 	//qDebug() << "GridPlot::createOpenGlData(): " << timer.elapsed();
 }
 
@@ -855,10 +926,23 @@ void GridPlot::drawOpenGlData()
 {
 	if (m_useThreads)
 	{
+		glEnable(GL_DEPTH_TEST);
+
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glEnableClientState(GL_NORMAL_ARRAY);
+		glEnableClientState(GL_COLOR_ARRAY);
+
 		for (int i = 0; i < m_threadsCount; i++)
 		{
+			// wait while threads are done
+			while (m_workers[i].isRunning());
+
 			m_workers[i].paintGL();
 		}
+
+		glDisableClientState(GL_COLOR_ARRAY);
+		glDisableClientState(GL_VERTEX_ARRAY);
+		glDisableClientState(GL_NORMAL_ARRAY);
 	}
 
 	SurfacePlot::drawOpenGlData();
@@ -870,30 +954,44 @@ void GridPlot::setRenderThreadsCount(int count)
 		m_threadsCount = 0;
 	else if (count > 10)
 		m_threadsCount = 10;
+	else
+		m_threadsCount = count;
 }
 
 void GridPlot::processVertex(const Triple& vert1, const Triple& norm1, 
 							 const Color& colorData, bool hl, bool& stripStarted,
 							 RGBA& lastColor) const
 {
+    static Triple lastVertex;
+
 	if (_isnan(vert1.z))
 	{
 		if (stripStarted){
 			stripStarted = false;
-			glEnd();
+
+			// degenerated triangle
+            glVertex3d(lastVertex.x, lastVertex.y, lastVertex.z);
+            glVertex3d(lastVertex.x, lastVertex.y, lastVertex.z);
+            //glEnd();
 		}
 	}
 	else{
 		if (!stripStarted){
 			stripStarted = true;
-			glBegin(GL_TRIANGLE_STRIP);
-		}
+            
+            // degenerated triangle
+			glVertex3d(vert1.x, vert1.y, vert1.z);
+            glVertex3d(vert1.x, vert1.y, vert1.z);
+			//glBegin(GL_TRIANGLE_STRIP);
+        }
 
-		setColorFromVertex(colorData, vert1, lastColor, hl);
+        setColorFromVertex(colorData, vert1, lastColor, hl);
 
-		glNormal3d(norm1.x, norm1.y, norm1.z);
+        glNormal3d(norm1.x, norm1.y, norm1.z);
 
 		glVertex3d(vert1.x, vert1.y, vert1.z);
+
+        lastVertex = vert1;
 	}
 }
 

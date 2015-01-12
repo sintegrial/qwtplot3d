@@ -92,8 +92,9 @@ protected:
 	public:
 		CVertexProcessor();
 
-		void setup(int dataWidth, int dataLength, const GridData& data, int row, int step = 1, 
-			bool m_colorize = true, const Color* colorData = NULL);
+		void setup(int dataWidth, int dataLength, const GridData& data, int row, int step, 
+			bool useColorMap, const Qwt3D::RGBA& fixedColor, const Color* colorData = NULL,
+			bool showMesh = false, const Qwt3D::RGBA& meshColor = Qwt3D::RGBA(0,0,0,0));
 
 		virtual void run();
 
@@ -103,17 +104,28 @@ protected:
 		void processVertex(bool& stripStarted, int i, int j, int& index, int& size);
 		void endVertex(int& index, int& size);
 
+		void processLineStripVertex(bool& stripStarted, int i, int j, int& index, int& size);
+		void endLineVertex(int& index, int& size);
+
 		int m_dataWidth, m_dataLength, m_row, m_step;
 		TripleVector m_draw_normals, m_draw_vertices;
 		ColorVector m_draw_colors;
 		std::vector< QPair<int,int> > m_drawList;
 		const GridData* m_data;
+		bool m_drawFill, m_useColorMap;
+		Qwt3D::RGBA m_fixedColor;
 		const Color* m_colorData;
-		bool m_colorize;
+
+		bool m_drawMesh;
+		Qwt3D::RGBA m_meshColor;
+		TripleVector m_mesh_vertices;
+		ColorVector m_mesh_colors;
+		std::vector< QPair<int,int> > m_drawMeshList;
 	};
 
 	int m_threadsCount;
 	CVertexProcessor m_workers[10];
+    bool m_useThreads;
 
     void createNormals(const Plotlet& pl);
     void data2Floor(const Plotlet& pl);
