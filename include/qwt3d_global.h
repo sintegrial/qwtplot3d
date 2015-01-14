@@ -12,7 +12,7 @@
 // Create Qwt3d DLL if QWT3D_DLL is defined (Windows only)
 //
 
-#if defined(Q_WS_WIN)
+#if defined(Q_OS_WIN)
   #if defined(_MSC_VER) /* MSVC Compiler */
     #pragma warning(disable: 4251) // dll interface required for stl templates
 	   //pragma warning(disable: 4244) // 'conversion' conversion from 'type1' to 'type2', possible loss of data
@@ -42,7 +42,7 @@
     #define QWT3D_TEMPLATEDLL
   #endif
 
-#else // ! Q_WS_WIN
+#else // ! Q_OS_WIN
   #undef QWT3D_MAKEDLL       /* ignore these for other platforms */
   #undef QWT3D_DLL
   #undef QWT3D_TEMPLATEDLL
