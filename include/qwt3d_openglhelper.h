@@ -4,7 +4,11 @@
 
 //#include <qglobal.h>
 #include <QtOpenGL/qgl.h>
+#ifdef Q_OS_MAC
+#include <OpenGL/glu.h>
+#else
 #include <GL/glu.h>
+#endif
 
 namespace Qwt3D
 {
