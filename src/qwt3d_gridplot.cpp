@@ -91,7 +91,7 @@ void GridPlot::CVertexProcessor::run()
 	m_draw_colors.clear();
 	m_drawList.clear();
 
-	if (m_drawFill)
+	if (m_drawFill && m_dataLength*m_dataWidth)
 	{
 		// reserve() gives up to 10% speedup
 		m_draw_normals.reserve(m_dataLength*m_dataWidth*2);
@@ -104,7 +104,7 @@ void GridPlot::CVertexProcessor::run()
 
 		for (int r = m_row; r < m_row + m_dataLength + 1 - m_step; r += m_step)
 		{
-			bool stripStarted = true;
+			bool stripStarted = false;
 
 			processVertex(stripStarted, r, 0, index, size);
 			processVertex(stripStarted, r+m_step, 0, index, size);
@@ -124,18 +124,18 @@ void GridPlot::CVertexProcessor::run()
 	m_mesh_colors.clear();
 	m_drawMeshList.clear();
 	
-	if (m_drawMesh)
+	if (m_drawMesh && m_dataLength*m_dataWidth)
 	{
 		int index = 0;
 		int size = 0;
 
 		int i, j;
 
-        for (i = m_step; i < m_dataWidth; i += m_step)
+        for (i = 0; i < m_dataWidth; i += m_step)
         {
-			bool stripStarted = true;
+			bool stripStarted = false;
 
-            for (j = 0; j < m_row + m_dataLength; j += m_step)
+            for (j = m_row; j < m_row + m_dataLength + 2 - m_step; j += m_step)
             {
 				processLineStripVertex(stripStarted, j, i, index, size);
             }
@@ -143,9 +143,9 @@ void GridPlot::CVertexProcessor::run()
 			endLineVertex(index, size);
         }
 
-        for (j = m_step; j < m_row + m_dataLength; j += m_step)
+        for (j = m_row; j < m_row + m_dataLength + 1 - m_step; j += m_step)
         {
-			bool stripStarted = true;
+			bool stripStarted = false;
 
             for (i = 0; i < m_dataWidth; i += m_step)
             {
@@ -153,7 +153,7 @@ void GridPlot::CVertexProcessor::run()
             }
 
 			endLineVertex(index, size);
-		}			
+		}		
 	}
 }
 
@@ -224,7 +224,7 @@ void GridPlot::CVertexProcessor::processLineStripVertex(bool& stripStarted, int 
 
 void GridPlot::CVertexProcessor::endLineVertex(int& index, int& size)
 {
-	if (size > 2){
+	if (size >= 2){
 		m_drawMeshList.push_back(QPair<int,int>(index, size));
 	}
 
@@ -237,6 +237,9 @@ void GridPlot::CVertexProcessor::paintGL()
 {
  	if (!m_draw_vertices.empty())
 	{
+		Q_ASSERT(m_draw_vertices.size() == m_draw_normals.size());
+		Q_ASSERT(m_draw_vertices.size() == m_draw_colors.size());
+
 		glVertexPointer(3, GL_DOUBLE, 0, &m_draw_vertices[0]);
 		glNormalPointer(GL_DOUBLE, 0, &m_draw_normals[0]);
 		glColorPointer(4, GL_DOUBLE, 0, &m_draw_colors[0]);
@@ -251,6 +254,8 @@ void GridPlot::CVertexProcessor::paintGL()
 	// mesh
 	if (!m_drawMeshList.empty())
 	{
+		Q_ASSERT(m_mesh_vertices.size() == m_mesh_colors.size());
+
 		glVertexPointer(3, GL_DOUBLE, 0, &m_mesh_vertices[0]);
 		glColorPointer(4, GL_DOUBLE, 0, &m_mesh_colors[0]);
 
@@ -556,6 +561,9 @@ void GridPlot::sewPeriodic(GridData& gdata)
 int GridPlot::createDataset(Triple** data, unsigned int columns, unsigned int rows, 
                             bool uperiodic /*=false*/, bool vperiodic /*=false*/, bool append /*= false*/)
 {
+	// block possible active threads
+	m_useThreads = false;
+
     int ret = prepareDatasetCreation<GridData>(append);
     if (ret < 0)
         return -1;
@@ -584,6 +592,9 @@ int GridPlot::createDataset(Triple** data, unsigned int columns, unsigned int ro
 int GridPlot::createDataset(double** data, unsigned int columns, unsigned int rows,
                             double minx, double maxx, double miny, double maxy, bool append /*= false*/)
 {	
+	// block possible active threads
+	m_useThreads = false;
+
     int ret = prepareDatasetCreation<GridData>(append);
     if (ret < 0)
         return -1;
@@ -916,8 +927,11 @@ void GridPlot::createOpenGlData(const Plotlet& pl)
 
 			r += length;
 		}
-	}
 
+		// wait while threads are done
+		for (int i = 0; i < m_threadsCount; i++)
+			while (m_workers[i].isRunning());
+	}
 
 	//qDebug() << "GridPlot::createOpenGlData(): " << timer.elapsed();
 }
@@ -933,12 +947,7 @@ void GridPlot::drawOpenGlData()
 		glEnableClientState(GL_COLOR_ARRAY);
 
 		for (int i = 0; i < m_threadsCount; i++)
-		{
-			// wait while threads are done
-			while (m_workers[i].isRunning());
-
 			m_workers[i].paintGL();
-		}
 
 		glDisableClientState(GL_COLOR_ARRAY);
 		glDisableClientState(GL_VERTEX_ARRAY);
