@@ -161,7 +161,7 @@ void GridPlot::CVertexProcessor::processVertex(bool& stripStarted, int i, int j,
 {
 	const Triple& v = m_data->vertices[j][i];
 
-	if (_isnan(v.z))
+    if (IS_NAN(v.z))
 	{
 		if (stripStarted){
 			stripStarted = false;
@@ -202,7 +202,7 @@ void GridPlot::CVertexProcessor::processLineStripVertex(bool& stripStarted, int 
 {
 	const Triple& v = m_data->vertices[j][i];
 
-	if (_isnan(v.z))
+    if (IS_NAN(v.z))
 	{
 		if (stripStarted){
 			stripStarted = false;
@@ -355,7 +355,7 @@ void GridPlot::readIn(GridData& gdata, Triple** data, unsigned int columns, unsi
             if (val.y < range.minVertex.y)
                 range.minVertex.y = val.y;
 
-			if (!_isnan(val.z))
+            if (!IS_NAN(val.z))
 			{
 				if (val.z < range.minVertex.z)
 					range.minVertex.z = val.z;
@@ -393,7 +393,7 @@ void GridPlot::readIn(GridData& gdata, double** data, unsigned int columns, unsi
             gdata_ij.y = miny + j*dy;
 			gdata_ij.z = val;
 
-			if (!_isnan(val))
+            if (!IS_NAN(val))
 			{
 				if (val > tmax)
 					tmax = val;
@@ -454,7 +454,7 @@ void GridPlot::calcNormals(GridData& gdata)
 			n.reset();
 
             const Triple& vert_ij = gdata.vertices[i][j];
-			if (_isnan(vert_ij.z))
+            if (IS_NAN(vert_ij.z))
 			{
 				continue;
 			}
@@ -464,7 +464,7 @@ void GridPlot::calcNormals(GridData& gdata)
 				const Triple& vert_ip1_j = gdata.vertices[i+1][j];
 				const Triple& vert_i_jp1 = gdata.vertices[i][j+1];
 
-				if (!_isnan(vert_i_jp1.z) && !_isnan(vert_i_jp1.z))
+                if (!IS_NAN(vert_i_jp1.z) && !IS_NAN(vert_i_jp1.z))
 				{
 					u = vert_ip1_j - vert_ij;
 					v = vert_i_jp1 - vert_ij;
@@ -478,7 +478,7 @@ void GridPlot::calcNormals(GridData& gdata)
 				const Triple& vert_i_jp1 = gdata.vertices[i][j+1];
 				const Triple& vert_im1_j = gdata.vertices[i-1][j];
 
-				if (!_isnan(vert_i_jp1.z) && !_isnan(vert_im1_j.z))
+                if (!IS_NAN(vert_i_jp1.z) && !IS_NAN(vert_im1_j.z))
 				{
 					u = vert_i_jp1 - vert_ij;
 					v = vert_im1_j - vert_ij;
@@ -492,7 +492,7 @@ void GridPlot::calcNormals(GridData& gdata)
 				const Triple& vert_i_jm1 = gdata.vertices[i][j-1];
 				const Triple& vert_im1_j = gdata.vertices[i-1][j];
 
-				if (!_isnan(vert_im1_j.z) && !_isnan(vert_i_jm1.z))
+                if (!IS_NAN(vert_im1_j.z) && !IS_NAN(vert_i_jm1.z))
 				{
 					u = vert_im1_j - vert_ij;
 					v = vert_i_jm1 - vert_ij;
@@ -506,7 +506,7 @@ void GridPlot::calcNormals(GridData& gdata)
 				const Triple& vert_i_jm1 = gdata.vertices[i][j-1];
 				const Triple& vert_ip1_j = gdata.vertices[i+1][j];
 
-				if (!_isnan(vert_i_jm1.z) && !_isnan(vert_ip1_j.z))
+                if (!IS_NAN(vert_i_jm1.z) && !IS_NAN(vert_ip1_j.z))
 				{
 					u = vert_i_jm1 - vert_ij;
 					v = vert_ip1_j - vert_ij;
@@ -973,7 +973,7 @@ void GridPlot::processVertex(const Triple& vert1, const Triple& norm1,
 {
     static Triple lastVertex;
 
-	if (_isnan(vert1.z))
+    if (IS_NAN(vert1.z))
 	{
 		if (stripStarted){
 			stripStarted = false;
@@ -1006,7 +1006,7 @@ void GridPlot::processVertex(const Triple& vert1, const Triple& norm1,
 
 void GridPlot::processLineLoopVertex(const Triple& vert1, bool& stripStarted) const
 {
-	if (_isnan(vert1.z))
+    if (IS_NAN(vert1.z))
 	{
 		if (stripStarted){
 			stripStarted = false;
@@ -1025,7 +1025,7 @@ void GridPlot::processLineLoopVertex(const Triple& vert1, bool& stripStarted) co
 
 void GridPlot::processLineStripVertex(const Triple& vert1, bool& stripStarted) const
 {
-	if (_isnan(vert1.z))
+    if (IS_NAN(vert1.z))
 	{
 		if (stripStarted){
 			stripStarted = false;

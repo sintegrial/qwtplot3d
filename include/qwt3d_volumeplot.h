@@ -31,7 +31,7 @@ struct Voxel
 
 	bool isValid() const
 	{
-		return !_isnan(x) && !_isnan(y) && !_isnan(z);
+        return !IS_NAN(x) && !IS_NAN(y) && !IS_NAN(z);
 	}
 
     float x,y,z;

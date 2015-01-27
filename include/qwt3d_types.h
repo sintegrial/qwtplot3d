@@ -10,6 +10,10 @@
 
 #if defined(Q_OS_WIN)
 	#include <windows.h>
+
+    #define IS_NAN(x) _isnan(x)
+#else
+    #define IS_NAN(x) isnan(x)
 #endif
 
 #include "qwt3d_portability.h"
@@ -240,7 +244,7 @@ struct QWT3D_EXPORT Triple
 	//! \since 0.3.2
 	bool isValid() const
 	{
-		return !_isnan(x) && !_isnan(y) && !_isnan(z);
+        return !IS_NAN(x) && !IS_NAN(y) && !IS_NAN(z);
 	}
 
 	//! \since 0.3.2

@@ -160,7 +160,7 @@ void Dot::drawEnd()
 
 void Dot::draw(Qwt3D::Triple const& pos)
 {
-	if (!_isnan(pos.z))
+    if (!IS_NAN(pos.z))
 	{
 		RGBA rgba = plot_p->dataColor()->rgba(pos);
 		glColor4d(rgba.r,rgba.g,rgba.b,rgba.a);
