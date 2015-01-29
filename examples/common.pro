@@ -23,7 +23,9 @@ win32{
     LIBS += -L../../lib -lqwtplot3d -lopengl32 -lglu32 -lgdi32
 }
 
-unix:LIBS += -L../../lib -lqwtplot3d -lGLU
+unix:!macx { LIBS += -L../../lib -lqwtplot3d -lGLU }
+
+macx: LIBS += -L../../lib -lqwtplot3d -framework OpenGL
 
 linux-g++:QMAKE_CXXFLAGS += -fno-exceptions
 
