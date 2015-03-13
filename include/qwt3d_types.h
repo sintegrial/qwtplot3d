@@ -8,6 +8,7 @@
 
 #include <string>
 
+#include <QtGlobal>
 #if defined(Q_OS_WIN)
 	#include <windows.h>
 
