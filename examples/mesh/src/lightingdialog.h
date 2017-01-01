@@ -36,7 +36,7 @@ typedef Qwt3D::GridPlot SPlot; // moc/VC6 issue in Qt4
 
 class Plot : public SPlot
 {
-  Q_OBJECT
+//  Q_OBJECT
     
 public:
   Plot(QWidget* parent);
