@@ -28,3 +28,11 @@
 *.app
 *.idb
 *.user
+
+# Visual Studio 2015 temporaries
+.v*
+*.user
+*.VC.db
+*.vcxproj.user
+
+
