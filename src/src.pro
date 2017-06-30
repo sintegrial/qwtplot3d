@@ -18,13 +18,7 @@ HEADERS           += ../include/*.h
 INCLUDEPATH       = ../include
 
 win32 {
-  !build_pass {
-    win32-msvc | win32-msvc2002 {
-      error(Unsupported Visual Studio version ( < 2003 ))
-    }
-  }
-  
-  win32-msvc2008 | win32-msvc2010 | win32-msvc2012 | win32-msvc2013 {
+  win32-msvc2008 | win32-msvc2010 | win32-msvc2012 | win32-msvc2013 | win32-msvc2015 {
     QMAKE_CXXFLAGS += -MP
     QMAKE_CXXFLAGS += $$QMAKE_CFLAGS_STL
     QMAKE_CXXFLAGS_RELEASE += /fp:fast /arch:SSE2
