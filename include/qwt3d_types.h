@@ -12,9 +12,9 @@
 #if defined(Q_OS_WIN)
 	#include <windows.h>
 
-    #define IS_NAN(x) _isnan(x)
+    #define IS_NAN(x) std::_isnan(x)
 #else
-    #define IS_NAN(x) isnan(x)
+    #define IS_NAN(x) std::isnan(x)
 #endif
 
 #include "qwt3d_portability.h"
