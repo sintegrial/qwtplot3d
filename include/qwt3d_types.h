@@ -14,6 +14,7 @@
 
     #define IS_NAN(x) std::_isnan(x)
 #else
+    #include <cmath>
     #define IS_NAN(x) std::isnan(x)
 #endif
 
