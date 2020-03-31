@@ -1,7 +1,8 @@
 TARGET            = qwtplot3d
 TEMPLATE          = lib
 DESTDIR      	  = ../lib
-CONFIG           += qt warn_on thread static
+CONFIG           += qt warn_on thread
+!unix:CONFIG += static
 QT               += opengl
 
 SOURCES           = *.cpp
@@ -28,6 +29,11 @@ win32 {
 linux-g++:QMAKE_CXXFLAGS += -fno-exceptions
 
 unix:VERSION = 0.3.1
+
+headfiles.path=/usr/local/include/qwt3d/
+headfiles.files=../include/*.h
+target.path = /usr/local/lib/
+INSTALLS += target headfiles
 
 MOC_DIR           = tmp
 OBJECTS_DIR       = tmp
