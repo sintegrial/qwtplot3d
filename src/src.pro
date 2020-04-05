@@ -30,9 +30,9 @@ linux-g++:QMAKE_CXXFLAGS += -fno-exceptions
 
 unix:VERSION = 0.3.1
 
-headfiles.path=/usr/local/include/qwt3d/
+headfiles.path=/usr/include/qwt3d/
 headfiles.files=../include/*.h
-target.path = /usr/local/lib/
+target.path = /usr/lib/
 INSTALLS += target headfiles
 
 MOC_DIR           = tmp
