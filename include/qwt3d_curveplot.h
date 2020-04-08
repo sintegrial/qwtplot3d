@@ -7,8 +7,9 @@ namespace Qwt3D {
 class CurvePlot : public Plot3D {
 public:
     explicit CurvePlot(QWidget *parent = nullptr, const QGLWidget *shareWidget = nullptr);
+    ~CurvePlot();
     void setPointsOnCurve(const TripleVector &points);
-    void setNurbsData(int knotCount, float *knots, int stride, float *ctrlpnts, int order);
+    void setNurbsData(int knotCount, double *knots, int stride, double *ctrlpnts, int order);
 
 protected:
     void createOpenGlData(const Plotlet &pl);
@@ -28,7 +29,6 @@ private:
     int mStride;
     float *mCtrlPtns;
     int mOrder;
-
     TripleVector mLinePoints;
 };
 
