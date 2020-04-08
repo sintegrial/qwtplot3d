@@ -26,6 +26,7 @@ bool CurvePlot::CurveData::empty() const
 
 CurvePlot::CurvePlot(QWidget *parent, const QGLWidget *shareWidget)
     : Plot3D(parent, shareWidget)
+    , theNurb(gluNewNurbsRenderer())
     , mKnotCount(0)
     , mKnots(Q_NULLPTR)
     , mStride(0)
@@ -147,7 +148,6 @@ void CurvePlot::createOpenGlData(const Plot3D::Plotlet &pl)
 
     glPushMatrix();
 
-    theNurb = gluNewNurbsRenderer();
     gluBeginCurve(theNurb);
     glColor3f(0.0, 0.0, 0.0);
     gluNurbsCurve(theNurb, mKnotCount, mKnots, mStride, mCtrlPtns, mOrder, GL_MAP1_VERTEX_3);
