@@ -23,13 +23,14 @@ private:
         bool empty() const;
     };
 
-    GLUnurbsObj *theNurb;
+    GLUnurbsObj *mGLU_Nurb;
     int mKnotCount;
     float *mKnots;
     int mStride;
     float *mCtrlPtns;
     int mOrder;
     TripleVector mLinePoints;
+    static void nurbsError(GLenum errorCode);
 };
 
 } // namespace Qwt3D

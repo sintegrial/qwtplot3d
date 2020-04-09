@@ -24,9 +24,15 @@ bool CurvePlot::CurveData::empty() const
     return true;
 }
 
+void CurvePlot::nurbsError(GLenum errorCode)
+{
+    const GLubyte *estring = gluErrorString(errorCode);
+    qWarning("Nurbs Error: %s \n", estring);
+}
+
 CurvePlot::CurvePlot(QWidget *parent, const QGLWidget *shareWidget)
     : Plot3D(parent, shareWidget)
-    , theNurb(gluNewNurbsRenderer())
+    , mGLU_Nurb(gluNewNurbsRenderer())
     , mKnotCount(0)
     , mKnots(Q_NULLPTR)
     , mStride(0)
@@ -34,6 +40,7 @@ CurvePlot::CurvePlot(QWidget *parent, const QGLWidget *shareWidget)
     , mOrder(0)
     , mLinePoints()
 {
+    gluNurbsCallback(mGLU_Nurb, GLU_ERROR, (GLvoid(*)())nurbsError);
     plotlets_p[0].data = ValuePtr<Data>(new CurveData);
 //    plotlets_p[0].data->setHull(ParallelEpiped(Triple(-1, -1, -1), Triple(1, 1, 1)));
     createCoordinateSystem();
@@ -148,10 +155,10 @@ void CurvePlot::createOpenGlData(const Plot3D::Plotlet &pl)
 
     glPushMatrix();
 
-    gluBeginCurve(theNurb);
+    gluBeginCurve(mGLU_Nurb);
     glColor3f(0.0, 0.0, 0.0);
-    gluNurbsCurve(theNurb, mKnotCount, mKnots, mStride, mCtrlPtns, mOrder, GL_MAP1_VERTEX_3);
-    gluEndCurve(theNurb);
+    gluNurbsCurve(mGLU_Nurb, mKnotCount, mKnots, mStride, mCtrlPtns, mOrder, GL_MAP1_VERTEX_3);
+    gluEndCurve(mGLU_Nurb);
 
     // draw control points
     glPointSize(5);
