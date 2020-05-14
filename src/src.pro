@@ -25,7 +25,7 @@ win32 {
 
 linux-g++:QMAKE_CXXFLAGS += -fno-exceptions
 
-unix:VERSION = 0.3.1
+unix:VERSION = 0.3.2
 
 MOC_DIR           = tmp
 OBJECTS_DIR       = tmp
