@@ -39,7 +39,7 @@ void ExtGLWidget::enableLighting(bool val)
 {
   if (lighting_enabled_ == val)
     return;
-  
+
   lighting_enabled_ = val;
   makeCurrent();
   if (val)
@@ -62,47 +62,47 @@ bool ExtGLWidget::lightingEnabled() const
   return lighting_enabled_;
 }
 
-/** 
+/**
   \param light light number [0..7]
-  \see setLight 
+  \see setLight
 */
 void ExtGLWidget::illuminate(unsigned light)
 {
   if (light>7)
-    return;  
-  lights_[light].unlit = false;  
+    return;
+  lights_[light].unlit = false;
 }
 /**
   \param light light number [0..7]
-  \see setLight  
+  \see setLight
 */
 void ExtGLWidget::blowout(unsigned light)
 {
   if (light>7)
     return;
-  lights_[light].unlit = false;  
+  lights_[light].unlit = false;
 }
 
-/** 
+/**
   Sets GL material properties
 */
 void ExtGLWidget::setMaterialComponent(GLenum property, double r, double g, double b, double a)
 {
   GLfloat rgba[4] = {(GLfloat)r, (GLfloat)g, (GLfloat)b, (GLfloat)a};
   makeCurrent();
-  glMaterialfv(GL_FRONT_AND_BACK, property, rgba);  
-}    
+  glMaterialfv(GL_FRONT_AND_BACK, property, rgba);
+}
 
-/** 
-  This function is for convenience. It sets GL material properties with the equal r,g,b values 
-  and a blending alpha with value 1.0 
+/**
+  This function is for convenience. It sets GL material properties with the equal r,g,b values
+  and a blending alpha with value 1.0
 */
 void ExtGLWidget::setMaterialComponent(GLenum property, double intensity)
 {
   setMaterialComponent(property,intensity,intensity,intensity,1.0);
-}    
+}
 
-/** 
+/**
   Sets GL shininess
 */
 void ExtGLWidget::setShininess(double exponent)
@@ -111,7 +111,7 @@ void ExtGLWidget::setShininess(double exponent)
   glMaterialf(GL_FRONT, GL_SHININESS, exponent);
 }
 
-/** 
+/**
   Sets GL light properties for light 'light'
 */
 void ExtGLWidget::setLightComponent(GLenum property, double r, double g, double b, double a, unsigned light)
@@ -119,20 +119,20 @@ void ExtGLWidget::setLightComponent(GLenum property, double r, double g, double 
   GLfloat rgba[4] = {(GLfloat)r, (GLfloat)g, (GLfloat)b, (GLfloat)a};
   makeCurrent();
   glLightfv(lightEnum(light), property, rgba);
-}    
+}
 
-/** 
-  This function is for convenience. It sets GL light properties with the equal r,g,b values 
-  and a blending alpha with value 1.0 
+/**
+  This function is for convenience. It sets GL light properties with the equal r,g,b values
+  and a blending alpha with value 1.0
 */
 void ExtGLWidget::setLightComponent(GLenum property, double intensity, unsigned light)
 {
   setLightComponent(property,intensity,intensity,intensity,1.0, lightEnum(light));
-}    
+}
 
 /**
   Set the rotation angle of the light source. If you look along the respective axis towards ascending values,
-	the rotation is performed in mathematical \e negative sense 
+	the rotation is performed in mathematical \e negative sense
 	\param xVal angle in \e degree to rotate around the X axis
 	\param yVal angle in \e degree to rotate around the Y axis
 	\param zVal angle in \e degree to rotate around the Z axis
@@ -141,7 +141,7 @@ void ExtGLWidget::setLightComponent(GLenum property, double intensity, unsigned 
 void ExtGLWidget::setLightRotation( double xVal, double yVal, double zVal, unsigned light )
 {
 	if (light>7)
-    return; 
+    return;
   lights_[light].rot.x = xVal;
   lights_[light].rot.y = yVal;
   lights_[light].rot.z = zVal;
@@ -158,7 +158,7 @@ void ExtGLWidget::setLightRotation( double xVal, double yVal, double zVal, unsig
 void ExtGLWidget::setLightShift( double xVal, double yVal, double zVal, unsigned light )
 {
 	if (light>7)
-    return; 
+    return;
   lights_[light].shift.x = xVal;
   lights_[light].shift.y = yVal;
   lights_[light].shift.z = zVal;
@@ -171,13 +171,13 @@ void ExtGLWidget::applyLight(unsigned light)
 
   glEnable(lightEnum(light));
   glLoadIdentity();
-  
-  glRotatef( lights_[light].rot.x-90, 1.0, 0.0, 0.0 ); 
-  glRotatef( lights_[light].rot.y   , 0.0, 1.0, 0.0 ); 
+
+  glRotatef( lights_[light].rot.x-90, 1.0, 0.0, 0.0 );
+  glRotatef( lights_[light].rot.y   , 0.0, 1.0, 0.0 );
   glRotatef( lights_[light].rot.z   , 0.0, 0.0, 1.0 );
-  GLfloat lightPos[4] = { (float)lights_[light].shift.x, (float)lights_[light].shift.y, (float)lights_[light].shift.z, 1.0};
+  GLfloat lightPos[4] = { static_cast<GLfloat>(lights_[light].shift.x), static_cast<GLfloat>(lights_[light].shift.y), static_cast<GLfloat>(lights_[light].shift.z), 1.0};
   GLenum le = lightEnum(light);
-  glLightfv(le, GL_POSITION, lightPos);  
+  glLightfv(le, GL_POSITION, lightPos);
 }
 
 void ExtGLWidget::applyLights()
