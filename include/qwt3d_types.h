@@ -9,16 +9,8 @@
 #include <string>
 
 #include <QtGlobal>
-#if __cplusplus <= 199711L  // c++98 or older
-#   if defined(Q_OS_WIN)
-#      include <windows.h>
-#      define IS_NAN(x) _isnan(x)
-#   else
-#      define IS_NAN(x) isnan(x)
-#   endif
-#else
-#   define IS_NAN(x) std::isnan(x)
-#endif
+#include <math.h>
+#define IS_NAN(x) std::isnan(x)
 
 
 #include "qwt3d_portability.h"
