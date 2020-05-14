@@ -1,7 +1,7 @@
 TARGET            = qwtplot3d
 TEMPLATE          = lib
 DESTDIR      	  = ../lib
-CONFIG           += qt warn_on thread static
+CONFIG           += qt warn_on thread static release
 QT               += opengl
 
 SOURCES           = *.cpp
@@ -18,11 +18,9 @@ HEADERS           += ../include/*.h
 INCLUDEPATH       = ../include
 
 win32 {
-  win32-msvc2008 | win32-msvc2010 | win32-msvc2012 | win32-msvc2013 | win32-msvc2015 {
     QMAKE_CXXFLAGS += -MP
     QMAKE_CXXFLAGS += $$QMAKE_CFLAGS_STL
     QMAKE_CXXFLAGS_RELEASE += /fp:fast /arch:SSE2
-  }
 }
 
 linux-g++:QMAKE_CXXFLAGS += -fno-exceptions
