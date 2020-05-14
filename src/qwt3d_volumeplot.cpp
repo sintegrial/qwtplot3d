@@ -13,8 +13,8 @@ namespace Qwt3D
 
 // VolumePlot
 
-VolumePlot::VolumePlot(QWidget *parent, const QGLWidget *shareWidget)
-    : Plot3D(parent, shareWidget)
+VolumePlot::VolumePlot(QWidget *parent)
+    : Plot3D(parent)
 {
     plotlets_p[0].data = ValuePtr<Data>(new GraphData);
 }

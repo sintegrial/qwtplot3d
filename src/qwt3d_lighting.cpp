@@ -49,7 +49,7 @@ void ExtGLWidget::enableLighting(bool val)
 
   if (!initializedGL())
     return;
-  updateGL();
+  update();
 }
 
 void ExtGLWidget::disableLighting(bool val)

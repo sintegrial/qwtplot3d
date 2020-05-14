@@ -3,6 +3,8 @@
 
 using namespace Qwt3D;
 
+#include <QPainter>
+
 Label::Label()
 {
   init();
@@ -58,7 +60,7 @@ void Label::setColor(double r, double g, double b, double a)
 {
   Drawable::setColor(r,g,b,a);
   flagforupdate_ = true;
-}   
+}
 
 void Label::setColor(Qwt3D::RGBA rgba)
 {
@@ -71,7 +73,7 @@ example:
 
 \verbatim
 
-   Anchor TopCenter (*)  resp. BottomRight(X) 
+   Anchor TopCenter (*)  resp. BottomRight(X)
 
    +----*----+
    |  Pixmap |
@@ -108,7 +110,7 @@ QImage Label::createImage(double angle)
       aux_a -= 180;
   if (aux_a > 90)
       aux_a -= 90;
-  
+
   double rad = aux_a * PI/180.0;
 
   int w = 0, h = 0;
@@ -116,13 +118,13 @@ QImage Label::createImage(double angle)
   {
       w = qRound(fabs(textWidth*cos(rad) + textHeight*sin(rad)));
       h = qRound(fabs(textWidth*sin(rad) + textHeight*cos(rad)));
-  } 
-  else 
+  }
+  else
   {
       w = qRound(fabs(textWidth*sin(rad) + textHeight*cos(rad)));
       h = qRound(fabs(textWidth*cos(rad) + textHeight*sin(rad)));
   }
-  
+
   width_ = w;
   height_ = h;
   QPixmap pm_ = QPixmap(w, h);
@@ -146,7 +148,8 @@ QImage Label::createImage(double angle)
   p.drawText(0, 0, text_);
   p.end();
 
-  return QGLWidget::convertToGLFormat(pm_.toImage());
+  QImage img = pm_.toImage();
+  return img.mirrored().convertToFormat(QImage::Format_RGBA8888);
 }
 
 /**
@@ -157,7 +160,7 @@ anchor type         shift
 
 left aligned         -->
 right aligned        <--
-top aligned          top-down            
+top aligned          top-down
 bottom aligned       bottom-up
 \endverbatim
 The unit is user space dependent (one pixel on screen - play around to get satisfying results)
@@ -170,7 +173,7 @@ void Label::adjust(int gap)
 void Label::convert2screen()
 {
   Triple start = World2ViewPort(pos_);
-  
+
   switch (anchor_)
   {
     case BottomLeft :
@@ -204,7 +207,7 @@ void Label::convert2screen()
       break;
   }
   start = World2ViewPort(beg_);
-  end_ = ViewPort2World(start + Triple(width(), height(), 0));    
+  end_ = ViewPort2World(start + Triple(width(), height(), 0));
 }
 
 const char * Label::fontname()
@@ -219,7 +222,7 @@ const char * Label::fontname()
       name = "Times-Italic";
     else if (font_.bold())
       name = "Times-Bold";
-  } 
+  }
   else if (font_.family() == "Courier" || font_.family() == "Courier New")
   {
     name = "Courier";
@@ -229,8 +232,8 @@ const char * Label::fontname()
       name = "Courier-Oblique";
     else if (font_.bold())
       name = "Courier-Bold";
-  } 
-  else 
+  }
+  else
   {
     if (font_.bold() && font_.italic ())
       name = "Helvetica-BoldOblique";
@@ -246,7 +249,7 @@ void Label::draw(double angle)
 {
   if (text_.isEmpty())
     return;
-  if ( use_relpos_ ) 
+  if ( use_relpos_ )
   {
     getMatrices(modelMatrix, projMatrix, viewport);
     beg_ = relativePosition(relpos_);
@@ -254,17 +257,17 @@ void Label::draw(double angle)
     use_relpos_ = true;// reset the flag
   }
 
-      
+
   GLboolean b;
   GLint func;
   GLdouble v;
   glGetBooleanv(GL_ALPHA_TEST, &b);
   glGetIntegerv(GL_ALPHA_TEST_FUNC, &func);
   glGetDoublev(GL_ALPHA_TEST_REF, &v);
-  
+
   glEnable (GL_ALPHA_TEST);
   glAlphaFunc (GL_NOTEQUAL, 0.0);
-  
+
   convert2screen();
   glRasterPos3d(beg_.x, beg_.y, beg_.z);
 
@@ -275,19 +278,19 @@ void Label::draw(double angle)
 }
 
 
-double Label::width() const 
-{ 
+double Label::width() const
+{
     if (width_ > 0.0 && height_ > 0.0)
         return width_;
     return QRect(QPoint(0, 0), QFontMetrics(font_).size(Qwt3D::SingleLine, text_)).width();
 }
 
-double Label::height() const 
-{ 
+double Label::height() const
+{
     if (width_ > 0.0 && height_ > 0.0)
         return height_;
     return QRect(QPoint(0, 0), QFontMetrics(font_).size(Qwt3D::SingleLine, text_)).height();
-}   
+}
 double Label::textHeight() const
 {
     return QRect(QPoint(0, 0), QFontMetrics(font_).size(Qwt3D::SingleLine, text_)).height();

@@ -79,7 +79,7 @@ void Drawable::detachAll()
 }
 
 
-//! simplified glut routine (glUnProject): windows coordinates_p --> object coordinates_p 
+//! simplified glut routine (glUnProject): windows coordinates_p --> object coordinates_p
 /**
 	Don't rely on (use) this in display lists !
 */
@@ -95,7 +95,7 @@ Triple Drawable::ViewPort2World(Triple win, bool* err)
 	return obj;
 }
 
-//! simplified glut routine (glProject): object coordinates_p --> windows coordinates_p 
+//! simplified glut routine (glProject): object coordinates_p --> windows coordinates_p
 /**
 	Don't rely on (use) this in display lists !
 */
@@ -127,15 +127,16 @@ void Drawable::draw()
 	{
 		(*it)->draw();
 	}
+
 	restoreGLState();
 }
 
 void Drawable::setColor(double r, double g, double b, double a)
 {
 	color = RGBA(r,g,b,a);
-}	
+}
 
 void Drawable::setColor(RGBA rgba)
 {
 	color = rgba;
-}	
+}

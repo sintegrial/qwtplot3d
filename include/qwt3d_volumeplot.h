@@ -51,7 +51,7 @@ struct Voxel
 class QWT3D_EXPORT VolumePlot : public Plot3D
 {
 public:
-    VolumePlot(QWidget *parent = 0, const QGLWidget *shareWidget = 0);
+    VolumePlot(QWidget *parent = 0);
 
     int createDataset(Voxel::Array const &nodes, bool append = false);
 

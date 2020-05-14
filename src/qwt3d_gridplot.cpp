@@ -29,13 +29,13 @@ GridPlot::GridData::GridData(unsigned int columns, unsigned int rows)
     setPeriodic(false,false);
 }
 
-int GridPlot::GridData::columns() const 
-{ 
+int GridPlot::GridData::columns() const
+{
     return (int)vertices.size();
 }
 
-int GridPlot::GridData::rows() const 
-{ 
+int GridPlot::GridData::rows() const
+{
     return (empty()) ? 0 : (int)vertices[0].size();
 }
 
@@ -123,7 +123,7 @@ void GridPlot::CVertexProcessor::run()
 	m_mesh_vertices.clear();
 	m_mesh_colors.clear();
 	m_drawMeshList.clear();
-	
+
 	if (m_drawMesh && m_dataLength*m_dataWidth)
 	{
 		int index = 0;
@@ -153,7 +153,7 @@ void GridPlot::CVertexProcessor::run()
             }
 
 			endLineVertex(index, size);
-		}		
+		}
 	}
 }
 
@@ -273,8 +273,8 @@ void GridPlot::CVertexProcessor::paintGL()
 /**
 	Initializes with dataNormals()==false, NOFLOOR, resolution() == 1
 */
-GridPlot::GridPlot(QWidget* parent, const QGLWidget* shareWidget)
-    : SurfacePlot(parent, shareWidget),
+GridPlot::GridPlot(QWidget* parent)
+    : SurfacePlot(parent),
 	m_threadsCount(0),
 	m_useThreads(false)
 {
@@ -289,7 +289,7 @@ void GridPlot::setColorFromVertex(const Color& colorData, const Triple& vertex, 
 
     RGBA col = colorData.rgba(vertex);
 	if (lastColor != col)
-	{ 
+	{
 		glColor4d(col.r, col.g, col.b, col.a);
 		lastColor = col;
 	}
@@ -369,7 +369,7 @@ void GridPlot::readIn(GridData& gdata, Triple** data, unsigned int columns, unsi
 }
 
 
-void GridPlot::readIn(GridData& gdata, double** data, unsigned int columns, unsigned int rows, 
+void GridPlot::readIn(GridData& gdata, double** data, unsigned int columns, unsigned int rows,
 					  double minx, double maxx, double miny, double maxy)
 {
     gdata.setPeriodic(false,false);
@@ -558,7 +558,7 @@ void GridPlot::sewPeriodic(GridData& gdata)
   be replaced by the new data. This includes destruction of possible additional datasets/Plotlets.
   \return Index of new entry in dataset array (append == true), 0 (append == false) or -1 for errors
   */
-int GridPlot::createDataset(Triple** data, unsigned int columns, unsigned int rows, 
+int GridPlot::createDataset(Triple** data, unsigned int columns, unsigned int rows,
                             bool uperiodic /*=false*/, bool vperiodic /*=false*/, bool append /*= false*/)
 {
 	// block possible active threads
@@ -579,9 +579,9 @@ int GridPlot::createDataset(Triple** data, unsigned int columns, unsigned int ro
     createCoordinateSystem();
 
     return ret;
-}	
+}
 
-/*! 
+/*!
   Convert user grid data to internal vertex structure.
   See also NativeReader::operator() and Function::create()
 
@@ -591,7 +591,7 @@ int GridPlot::createDataset(Triple** data, unsigned int columns, unsigned int ro
   */
 int GridPlot::createDataset(double** data, unsigned int columns, unsigned int rows,
                             double minx, double maxx, double miny, double maxy, bool append /*= false*/)
-{	
+{
 	// block possible active threads
 	m_useThreads = false;
 
@@ -624,7 +624,7 @@ int GridPlot::createDataset(double** data, unsigned int columns, unsigned int ro
     createCoordinateSystem();
 
     return ret;
-}	
+}
 
 void GridPlot::data2Floor(const Plotlet& pl)
 {
@@ -699,7 +699,7 @@ void GridPlot::isolines2Floor(const Plotlet& pl)
         double val = isolinesZ_p[k];
         if (val > data.hull().maxVertex.z || val < data.hull().minVertex.z)
             continue;
-        
+
         for (int i = 0; i < cols-step; i += step)
         {
             for (int j = 0; j < rows-step; j += step)
@@ -749,7 +749,7 @@ void GridPlot::setResolution(int res)
     updateData();
     updateNormals();
     if (initializedGL())
-        updateGL();
+        update();
 
     emit resolutionChanged(res);
 }
@@ -814,7 +814,7 @@ void GridPlot::createOpenGlData(const Plotlet& pl)
 		if (drawFill)
 		{
 	        glPolygonMode(GL_FRONT_AND_BACK, GL_QUADS);
-	
+
 			if (hl)
 				glColor4d(col.r, col.g, col.b, col.a);
 
@@ -903,7 +903,7 @@ void GridPlot::createOpenGlData(const Plotlet& pl)
 				}
 
 				glEnd();
-			}		
+			}
 		}
 	}
 	else // new glDrawArrays-based render
@@ -919,8 +919,8 @@ void GridPlot::createOpenGlData(const Plotlet& pl)
 			if (i == m_threadsCount-1)
 				length += lastrow - (length * m_threadsCount) - 1;
 
-			m_workers[i].setup(lastcol, length, data, r, step, 
-				!hl, col, drawFill ? &colorData : NULL, 
+			m_workers[i].setup(lastcol, length, data, r, step,
+				!hl, col, drawFill ? &colorData : NULL,
 				drawMesh, app.meshColor());
 
 			m_workers[i].start(QThread::HighPriority);
@@ -967,7 +967,7 @@ void GridPlot::setRenderThreadsCount(int count)
 		m_threadsCount = count;
 }
 
-void GridPlot::processVertex(const Triple& vert1, const Triple& norm1, 
+void GridPlot::processVertex(const Triple& vert1, const Triple& norm1,
 							 const Color& colorData, bool hl, bool& stripStarted,
 							 RGBA& lastColor) const
 {
@@ -987,7 +987,7 @@ void GridPlot::processVertex(const Triple& vert1, const Triple& norm1,
 	else{
 		if (!stripStarted){
 			stripStarted = true;
-            
+
             // degenerated triangle
 			glVertex3d(vert1.x, vert1.y, vert1.z);
             glVertex3d(vert1.x, vert1.y, vert1.z);

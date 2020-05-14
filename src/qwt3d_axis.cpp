@@ -110,6 +110,15 @@ void Axis::setLineWidth(double val, double majfac, double minfac)
     minLineWidth_ = minfac * lineWidth_;
 }
 
+/*!
+  Returns axis interval
+*/
+void Axis::limits(double& start, double& stop) const
+{
+	start = start_;
+	stop = stop_;
+}
+
 void Axis::draw()
 {
     Drawable::draw();
@@ -173,7 +182,7 @@ void Axis::drawBase()
     glVertex3d( beg_.x, beg_.y, beg_.z);
     glVertex3d( end_.x, end_.y, end_.z);
     glEnd();
-}   
+}
 
 bool Axis::prepTicCalculation(Triple& startpoint)
 {
@@ -237,7 +246,7 @@ void Axis::drawTics()
 
     unsigned int i;
     Triple nadir;
-    
+
     markerLabel_.resize(scale_->majors_p.size());
     setLineWidth(majLineWidth_);
     for (i = 0; i != scale_->majors_p.size(); ++i)
@@ -260,7 +269,7 @@ void Axis::drawTicLabel(Triple pos, int mtic)
 {
     if (!drawNumbers_ || (mtic < 0))
         return;
-    
+
     markerLabel_[mtic].setFont(numberfont_.family(), numberfont_.pointSize(), numberfont_.weight(), numberfont_.italic());
     markerLabel_[mtic].setColor(numbercolor_);
     markerLabel_[mtic].setString(scale_->ticLabel(mtic));
@@ -330,7 +339,7 @@ void Axis::setLabelColor(RGBA col)
     label_.setColor(col);
 }
 
-/*! 
+/*!
   This variant sets a user-defined scale object.
   Use with a heap based initialized pointer only.
   The axis adopts ownership.

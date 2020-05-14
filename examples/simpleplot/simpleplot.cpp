@@ -8,7 +8,7 @@
   #include <qapplication.h>
   #include <qwt3d_gridplot.h>
   #include <qwt3d_function.h>
-  
+
 
   using namespace Qwt3D;
 
@@ -38,7 +38,7 @@
   Plot::Plot()
   {
     setTitle("A Simple GridPlot Demonstration");
-    
+
     Rosenbrock rosenbrock(*this);
 
     rosenbrock.setMesh(100,100);    // 200000 polys
@@ -67,7 +67,7 @@
     setCoordinateStyle(BOX);
 
     updateData();
-    updateGL();
+    update();
   }
 
   int main(int argc, char **argv)
