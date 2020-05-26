@@ -24,10 +24,10 @@ class QWT3D_EXPORT Plot3D : public ExtGLWidget
     Q_OBJECT
 
 public:
-    Plot3D (QWidget * parent = 0, const QGLWidget * shareWidget = 0);
+    Plot3D (QWidget * parent = 0);
     virtual ~Plot3D();
 
-    QPixmap renderPixmap (int w=0, int h=0, bool useContext=false);
+    QPixmap renderPixmap (int w=0, int h=0);
 
     void updateData(); //!< Recalculate data
 
@@ -37,7 +37,7 @@ public:
     void createCoordinateSystem(Qwt3D::Triple beg, Qwt3D::Triple end);
     void setCoordinateStyle(Qwt3D::COORDSTYLE st); //!< Sets style of coordinate system.
 
-    Qwt3D::ColorLegend* legend() { return &legend_;} //!< Returns pointer to ColorLegend object
+    Qwt3D::ColorLegend* legend(); //!< Returns pointer to ColorLegend object
     void showColorLegend(bool show, unsigned idx = 0);
     //! \since 0.3.1
     bool isLegendVisible() const { return displaylegend_; }
@@ -61,7 +61,7 @@ public:
     //! Returns number of Plotlets
     unsigned plotlets() const {return plotlets_p.size();}
     //! Returns false, if at least one valid dataset exists.
-    inline bool hasData() const;
+    bool hasData() const;
     //! Returns appearance for Plotlet at position idx
     inline Appearance& appearance(unsigned idx);
     //! Returns appearance for Plotlet at position idx
@@ -103,7 +103,7 @@ public:
 public slots:
     virtual bool save(QString const& fileName, QString const& format); //!<  Saves content
 
-protected:   
+protected:
     enum OBJECTS
     {
         DataObject,
@@ -131,7 +131,7 @@ protected:
     void resizeGL(int w, int h);
 
     Qwt3D::CoordinateSystem coordinates_p;
-    
+
     virtual	void calculateHull();
     virtual void updateAppearances();
     virtual void createOpenGlData();
@@ -194,17 +194,9 @@ private:
 };
 
 
-// Inline functions
-
-bool Plot3D::hasData() const 
-{
-    return plotlets() > 0 && !plotlets_p[0].data->empty();
-}
-
-
 /**
 The function returns the Appearance object for the Plotlet at idx.
-For invalid arguments the return value contains the standard appearance 
+For invalid arguments the return value contains the standard appearance
 (equivalent to idx==0) is returned
 */
 Appearance& Plot3D::appearance(unsigned idx)
@@ -217,7 +209,7 @@ Appearance& Plot3D::appearance(unsigned idx)
 
 /**
 The function returns the Appearance object for the Plotlet at idx.
-For invalid arguments the return value contains the standard appearance 
+For invalid arguments the return value contains the standard appearance
 (equivalent to idx==0) is returned
 */
 const Appearance& Plot3D::appearance(unsigned idx) const

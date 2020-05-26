@@ -9,14 +9,9 @@
 #include <string>
 
 #include <QtGlobal>
-#if defined(Q_OS_WIN)
-	#include <windows.h>
+#include <math.h>
+#define IS_NAN(x) std::isnan(x)
 
-    #define IS_NAN(x) std::_isnan(x)
-#else
-    #include <cmath>
-    #define IS_NAN(x) std::isnan(x)
-#endif
 
 #include "qwt3d_portability.h"
 #include "qwt3d_helper.h"
@@ -34,7 +29,7 @@ enum PLOTSTYLE
 	NOPLOT     , //!< No visible data
 	WIREFRAME  , //!< Wireframe style
 	HIDDENLINE , //!< Hidden Line style
-	FILLED     , //!< Color filled polygons w/o edges 
+	FILLED     , //!< Color filled polygons w/o edges
 	FILLEDMESH , //!< Color filled polygons w/ separately colored edges
 	POINTS     , //!< User defined style (used by Enrichments)
 	USER         //!< User defined style (used by Enrichments)
@@ -50,7 +45,7 @@ enum SHADINGSTYLE
 //! Style of Coordinate system
 enum COORDSTYLE
 {
-	NOCOORD, //!< Coordinate system is not visible 
+	NOCOORD, //!< Coordinate system is not visible
 	BOX,     //!< Boxed
 	FRAME		 //!< Frame - 3 visible axes
 };
@@ -58,7 +53,7 @@ enum COORDSTYLE
 //! Different types of axis scales
 enum SCALETYPE
 {
-	LINEARSCALE,//!< Linear scaling 
+	LINEARSCALE,//!< Linear scaling
 	LOG10SCALE,	//!< Logarithmic scaling (base 10)
 	USERSCALE   //!< User-defined (for extensions)
 };
@@ -73,7 +68,7 @@ enum FLOORSTYLE
 
 //! The 12 axes
 /**
-\image html axes.png 
+\image html axes.png
 */
 enum AXIS
 {
@@ -124,7 +119,7 @@ struct QWT3D_EXPORT Tuple
 	Tuple() : x(0), y(0) {} //!< Calls Tuple(0,0)
 	Tuple(double X, double Y) : x(X), y(Y) {} //!< Initialize Tuple with x and y
 	//! Tuple coordinates
-  double x,y; 
+  double x,y;
 };
 
 //! Triple <tt>[x,y,z]</tt>
@@ -134,11 +129,11 @@ Consider Triples also as vectors in R^3
 struct QWT3D_EXPORT Triple
 {
 	//! Initialize Triple with x,y and z
-	explicit Triple(double xv = 0,double yv = 0,double zv = 0) 
+	explicit Triple(double xv = 0,double yv = 0,double zv = 0)
 		: x(xv), y(yv), z(zv)
 	{
 	}
-	
+
 #ifndef QWT3D_NOT_FOR_DOXYGEN
 #ifdef Q_OS_IRIX
   Triple(const Triple& val)
@@ -158,11 +153,11 @@ struct QWT3D_EXPORT Triple
     z = val.z;
     return *this;
   }
-#endif 
+#endif
 #endif // QWT3D_NOT_FOR_DOXYGEN
-  
+
 	//! Triple coordinates
-	double x,y,z; 
+	double x,y,z;
 
 	Triple& operator+=(const Triple& t)
 	{
@@ -172,7 +167,7 @@ struct QWT3D_EXPORT Triple
 
 		return *this;
 	}
-	
+
 	Triple& operator-=(const Triple& t)
 	{
 		x -= t.x;
@@ -213,7 +208,7 @@ struct QWT3D_EXPORT Triple
 	{
 		return !isPracticallyZero(x,t.x) || !isPracticallyZero(y,t.y) || !isPracticallyZero(z,t.z);
 	}
-	
+
 	bool operator==(const Triple& t) const
 	{
 		return !operator!=(t);
@@ -224,7 +219,7 @@ struct QWT3D_EXPORT Triple
 		double l2 = x*x + y*y + z*z;
 		return (isPracticallyZero(l2)) ? 0 :sqrt(l2);
 	}
-	
+
 	void normalize()
 	{
 		double l = length();
@@ -314,7 +309,7 @@ struct QWT3D_EXPORT ParallelEpiped
 	: minVertex(minv), maxVertex(maxv)
 	{
 	}
-	
+
 	Triple minVertex;
 	Triple maxVertex;
 };
@@ -322,21 +317,21 @@ struct QWT3D_EXPORT ParallelEpiped
 inline ParallelEpiped sum(const ParallelEpiped& a, const ParallelEpiped& b)
 {
   Triple mi = a.minVertex - b.minVertex;
-  mi.x = (mi.x<0) ? a.minVertex.x : b.minVertex.x; 
-  mi.y = (mi.y<0) ? a.minVertex.y : b.minVertex.y; 
-  mi.z = (mi.z<0) ? a.minVertex.z : b.minVertex.z; 
-  
+  mi.x = (mi.x<0) ? a.minVertex.x : b.minVertex.x;
+  mi.y = (mi.y<0) ? a.minVertex.y : b.minVertex.y;
+  mi.z = (mi.z<0) ? a.minVertex.z : b.minVertex.z;
+
   Triple ma = a.maxVertex - b.maxVertex;
-  ma.x = (ma.x>0) ? a.maxVertex.x : b.maxVertex.x; 
-  ma.y = (ma.y>0) ? a.maxVertex.y : b.maxVertex.y; 
-  ma.z = (ma.z>0) ? a.maxVertex.z : b.maxVertex.z; 
+  ma.x = (ma.x>0) ? a.maxVertex.x : b.maxVertex.x;
+  ma.y = (ma.y>0) ? a.maxVertex.y : b.maxVertex.y;
+  ma.z = (ma.z>0) ? a.maxVertex.z : b.maxVertex.z;
 
   return ParallelEpiped(mi, ma);
 }
 
 //! Free vector
 /**
-	FreeVectors represent objects like normal vectors and other vector fields inside R^3 
+	FreeVectors represent objects like normal vectors and other vector fields inside R^3
 */
 struct QWT3D_EXPORT FreeVector
 {
@@ -353,7 +348,7 @@ struct QWT3D_EXPORT FreeVector
 	: base(b), top(t)
 	{
 	}
-	
+
 	Triple base;
 	Triple top;
 };
@@ -382,7 +377,7 @@ struct QWT3D_EXPORT RGBA
 	RGBA()
 		: r(0), g(0), b(0), a(1)
 		{}
-	
+
 	RGBA(double rr, double gg, double bb, double aa = 1)
 		: r(rr), g(gg), b(bb), a(aa)
 		{}
@@ -421,7 +416,7 @@ inline Triple normalizedcross(Triple const& u, Triple const& v)
 
 	/* normalize */
 	n.normalize();
-	
+
 	return n;
 }
 
@@ -433,7 +428,7 @@ inline double dotProduct(Triple const& u, Triple const& v)
 void convexhull2d( std::vector<unsigned>& idx, const std::vector<Qwt3D::Tuple>& src );
 
 
-#endif // QWT3D_NOT_FOR_DOXYGEN 
+#endif // QWT3D_NOT_FOR_DOXYGEN
 
 } // ns
 

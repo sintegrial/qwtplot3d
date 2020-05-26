@@ -1,8 +1,15 @@
-		QwtPlot3d 0.3.1a
+		QwtPlot3d 0.3.2
 
 	--------------------------------
 	http://qwtplot3d.sourceforge.net
 
+
+Version 0.3.2 - May 2020
+---------------------------------------------------------------------------
+- fixed building issues with ealier versions of Visual Studio
+- fixed building issues on unix
+- replaced QGLWidget with QOpenGLWidget
+- Known issues: some examples are not working anymore
 
 
 Version 0.3.1a - Sep 2014
@@ -26,11 +33,14 @@ License notes
 ---------------------------------------------------------------------------
 This distribution is mainly based on QwtPlot3d 0.3.0 revision 259
 (http://sourceforge.net/p/qwtplot3d/code/HEAD/tree/)
-
-Parts of the software are provided by Sintegrial Technologies (c) 2013-2014
+and further revions provided by Sintegrial Technologies (c) 2013-2014
 (http://sintegrial.com)
+(https://github.com/sintegrial/qwtplot3d)
 
-Extensions made by Sintegrial Technologies are provided 'as-is', without
+Parts of the software are provided by Applied Coherent Technologies Corporation (c) 2001-2020
+(http://www.actgate.com)
+
+Extensions made by Applied Coherent Technologies Corporation are provided 'as-is', without
 any warranty. They are granted under the terms of the original QwtPlot3D 
 license.
 

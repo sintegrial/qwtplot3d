@@ -25,20 +25,20 @@ Plot::Plot(QWidget* pw, int updateinterval)
 		coordinates()->axes[i].setMajors(7);
 		coordinates()->axes[i].setMinors(4);
 	}
-	
-	
+
+
 	coordinates()->axes[Qwt3D::X1].setLabelString("x");
 	coordinates()->axes[Y1].setLabelString("y");
-	coordinates()->axes[Z1].setLabelString("z"); 
+	coordinates()->axes[Z1].setLabelString("z");
 	coordinates()->axes[X2].setLabelString("x");
 	coordinates()->axes[Y2].setLabelString("y");
-	coordinates()->axes[Z2].setLabelString("z"); 
+	coordinates()->axes[Z2].setLabelString("z");
 	coordinates()->axes[X3].setLabelString("x");
 	coordinates()->axes[Y3].setLabelString("y");
-	coordinates()->axes[Z3].setLabelString("z"); 
+	coordinates()->axes[Z3].setLabelString("z");
 	coordinates()->axes[X4].setLabelString("x");
 	coordinates()->axes[Y4].setLabelString("y");
-	coordinates()->axes[Z4].setLabelString("z"); 
+	coordinates()->axes[Z4].setLabelString("z");
 
 
   QTimer* timer = new QTimer( this );
@@ -51,7 +51,7 @@ Plot::Plot(QWidget* pw, int updateinterval)
 void Plot::rotate()
 {
 	int prec = 3;
-		
+
 	setRotation(
 			(int(prec*xRotation() + 2) % (360*prec))/double(prec),
 			(int(prec*yRotation() + 2) % (360*prec))/double(prec),
@@ -73,7 +73,7 @@ int main(int argc, char **argv)
 		plot1->setBackgroundColor(RGBA(1,1, 157./255));
 		plot1->makeCurrent();
 		plot1->updateData();
-		plot1->updateGL();
+		plot1->update();
 
 
 		Plot* plot2 = new Plot(spl,80);
@@ -86,9 +86,9 @@ int main(int argc, char **argv)
 		plot2->setBackgroundColor(RGBA(1,1, 157./255));
 		plot2->makeCurrent();
 		plot2->updateData();
-		plot2->updateGL();
+		plot2->update();
 
     spl->resize(800,400);
     spl->show();
-    return a.exec(); 
+    return a.exec();
 }

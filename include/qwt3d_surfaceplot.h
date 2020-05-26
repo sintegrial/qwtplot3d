@@ -9,14 +9,14 @@ namespace Qwt3D
 //! A class representing  Surfaces
 /**
 	A SurfacePlot ...
-	
+
 */
 class QWT3D_EXPORT SurfacePlot : public Plot3D
 {
   Q_OBJECT
 
 public:
-  SurfacePlot( QWidget * parent = 0, const QGLWidget * shareWidget = 0 );
+  SurfacePlot( QWidget * parent = 0 );
 
   void showNormals(bool); //!< Draw normals to every vertex
   bool normals() const { return datanormals_p;} //!< Returns \c true, if normal drawing is on
@@ -30,7 +30,7 @@ public:
   //! Delete Plotlet with index idx.
   bool removePlotlet(unsigned idx);
 
-protected:  
+protected:
   bool datanormals_p;
   double normalLength_p;
   int normalQuality_p;

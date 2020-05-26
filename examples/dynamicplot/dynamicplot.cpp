@@ -90,7 +90,7 @@ void Plot::UpdateData()
     setTitle(QString("Dynamic Plotter Demonstration - Frame Time %1 ms").arg(rate));
 
     //updateData();
-	updateGL();
+	update();
 }
 
 int main(int argc, char **argv)

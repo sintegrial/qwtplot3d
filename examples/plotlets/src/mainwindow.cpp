@@ -12,7 +12,7 @@
 #include <qtoolbar.h>
 #include <qimage.h>
 #include <qpixmap.h>
-#include <qfiledialog.h>       
+#include <qfiledialog.h>
 #include <qstatusbar.h>
 #include <qfileinfo.h>
 #include <qslider.h>
@@ -36,12 +36,12 @@ using namespace Qwt3D;
 using namespace std;
 
 
-MainWindow::~MainWindow()      
+MainWindow::~MainWindow()
 {
 	delete dataWidget;
 }
 
-MainWindow::MainWindow( QWidget* parent )       
+MainWindow::MainWindow( QWidget* parent )
 	: QMainWindow( parent )
 {
 	setupUi(this);
@@ -78,7 +78,7 @@ MainWindow::MainWindow( QWidget* parent )
 
 
  PM_IT i = pmanager.begin();
- while (i != pmanager.end()) 
+ while (i != pmanager.end())
  {
    connect( i->cbox, SIGNAL( toggled( bool ) ), this, SLOT( togglePlotlet( bool ) ) );
    connect(i->cfgframe, SIGNAL(meshColorChanged()), this, SLOT(setMeshColor()));
@@ -93,11 +93,11 @@ MainWindow::MainWindow( QWidget* parent )
 	//resSlider->setRange(1,70);
 	//connect( resSlider, SIGNAL(valueChanged(int)), dataWidget, SLOT(setResolution(int)) );
 	//connect( dataWidget, SIGNAL(resolutionChanged(int)), resSlider, SLOT(setValue(int)) );
-	//resSlider->setValue(1);             
+	//resSlider->setValue(1);
 	//
 	//connect( offsSlider, SIGNAL(valueChanged(int)), this, SLOT(setPolygonOffset(int)) );
 
-	connect(normButton, SIGNAL(clicked()), this, SLOT(setStandardView()));  
+	connect(normButton, SIGNAL(clicked()), this, SLOT(setStandardView()));
 	//
  // QString qwtstr(" qwtplot3d ");
  // qwtstr += QString::number(QWT3D_MAJOR_VERSION) + ".";
@@ -108,7 +108,7 @@ MainWindow::MainWindow( QWidget* parent )
 	//connect(colorlegend, SIGNAL( toggled(bool) ), this, SLOT( toggleColorLegend(bool)));
 	connect(autoscale, SIGNAL( toggled(bool) ), this, SLOT( toggleAutoScale(bool)));
 	//connect(normals, SIGNAL( toggled(bool) ), this, SLOT( showNormals(bool)));
-	//		
+	//
 	setStandardView();
 
 	dataWidget->coordinates()->setLineSmooth(true);
@@ -145,29 +145,29 @@ MainWindow::MainWindow( QWidget* parent )
 int MainWindow::createFunction(QString const& name, bool append /*= true*/)
 {
 	dataWidget->makeCurrent();
-  if (name == QString("hat")) 
+  if (name == QString("hat"))
   {
     Hat hat(*dataWidget, true);
 
     hat.setMesh(51,72);
     hat.setDomain(-1.5,1.5,-1.5,1.5);
-    hat.create(append);	
+    hat.create(append);
   }
-  else if (name == QString("hatn")) 
+  else if (name == QString("hatn"))
   {
     Hat hat(*dataWidget, false);
 
     hat.setMesh(51,72);
     hat.setDomain(-1.5,1.5,-1.5,1.5);
-    hat.create(append);	
+    hat.create(append);
   }
-	else if (name == QString("ripple")) 
+	else if (name == QString("ripple"))
 	{
 		Ripple ripple(*dataWidget);
     ripple.setMesh(120,120);
-		ripple.create(append);	
+		ripple.create(append);
 	}
-  else if (name == QString("boy")) 
+  else if (name == QString("boy"))
   {
     Boy boy(*dataWidget);
     boy.create(append);
@@ -177,7 +177,7 @@ int MainWindow::createFunction(QString const& name, bool append /*= true*/)
 
   if (append)
     return (int)(dataWidget->plotlets() - 1);
-  
+
   return 0;
 }
 
@@ -189,7 +189,7 @@ void MainWindow::setPlotStyle()
     return;
   dataWidget->appearance(pos).setPlotStyle(w->plotstyle());
   dataWidget->updateData();
-  dataWidget->updateGL();
+  dataWidget->update();
 }
 
 void MainWindow::pickFloorStyle( QAction* /*action*/ )
@@ -211,8 +211,8 @@ void MainWindow::pickFloorStyle( QAction* /*action*/ )
 	//}
 	//
 	//dataWidget->updateData();
-	//dataWidget->updateGL();
-}	
+	//dataWidget->update();
+}
 
 void MainWindow::setMeshColor()
 {
@@ -222,7 +222,7 @@ void MainWindow::setMeshColor()
     return;
 	dataWidget->appearance(pos).setMeshColor(w->meshColor());
 	dataWidget->updateData();
-	dataWidget->updateGL();
+	dataWidget->update();
 }
 
 void MainWindow::setDataColor()
@@ -235,7 +235,7 @@ void MainWindow::setDataColor()
   dataWidget->updateData();
   dataWidget->updateNormals();
   //dataWidget->showColorLegend(legend_);
-  dataWidget->updateGL();
+  dataWidget->update();
 }
 
 void MainWindow::setStandardView()
@@ -260,28 +260,28 @@ void MainWindow::toggleColorLegend(bool /*val*/)
 void MainWindow::toggleAutoScale(bool val)
 {
 	dataWidget->coordinates()->setAutoScale(val);
-	dataWidget->updateGL();
+	dataWidget->update();
 }
 
 void MainWindow::showNormals(bool /*val*/)
 {
 	//dataWidget->showNormals(val);
 	//dataWidget->updateNormals();
-	//dataWidget->updateGL();
+	//dataWidget->update();
 }
 
 void MainWindow::setNormalLength(int /*val*/)
 {
 	//dataWidget->setNormalLength(val / 400.);
 	//dataWidget->updateNormals();
-	//dataWidget->updateGL();
+	//dataWidget->update();
 }
 
 void MainWindow::setNormalQuality(int /*val*/)
 {
 	//dataWidget->setNormalQuality(val);
 	//dataWidget->updateNormals();
-	//dataWidget->updateGL();
+	//dataWidget->update();
 }
 
 void MainWindow::updateColorLegend(int /*majors*/, int /*minors*/)
@@ -291,7 +291,7 @@ void MainWindow::updateColorLegend(int /*majors*/, int /*minors*/)
 	//double start, stop;
 	//dataWidget->coordinates()->axes[Z1].limits(start,stop);
 	//dataWidget->legend()->setLimits(start, stop);
-}		
+}
 
 void MainWindow::togglePlotlet(bool val)
 {
@@ -301,13 +301,13 @@ void MainWindow::togglePlotlet(bool val)
     if (2 == dataWidget->plotlets()) // we are going to remove the penultimate plotlet...
     {
       // ... so make sure, the last one will be secured
-      while (i != pmanager.end()) 
+      while (i != pmanager.end())
       {
         if (i->cbox->isChecked() && i->cbox != sender())
         {
           i->cbox->setEnabled(false);
           break;
-        }       
+        }
         ++i;
       }
     }
@@ -315,7 +315,7 @@ void MainWindow::togglePlotlet(bool val)
     // ... remove the plotlet
     int deleted = -1;
     i = pmanager.begin();
-    while (i != pmanager.end()) 
+    while (i != pmanager.end())
     {
       if (sender() == i->cbox)
       {
@@ -326,17 +326,17 @@ void MainWindow::togglePlotlet(bool val)
       }
       ++i;
     }
-    
+
     // ... recalculate indexes
     if (deleted>=0)
     {
       i = pmanager.begin();
-      while (i != pmanager.end()) 
+      while (i != pmanager.end())
       {
         if (i->pos >= deleted)
         {
           --i->pos; // cannot be < 1 prior to decr.
-        }      
+        }
         ++i;
       }
     }
@@ -344,7 +344,7 @@ void MainWindow::togglePlotlet(bool val)
   else // adding plotlets
   {
     PM_IT i = pmanager.begin();
-    while (i != pmanager.end()) 
+    while (i != pmanager.end())
     {
       // re-enable possible single plotlet checkbox
       if (!i->cbox->isEnabled())
@@ -357,20 +357,20 @@ void MainWindow::togglePlotlet(bool val)
           dataWidget->appearance(i->pos).setMeshColor(i->cfgframe->meshColor());
           dataWidget->appearance(i->pos).setDataColor(i->cfgframe->dataColor());
           dataWidget->appearance(i->pos).setPlotStyle(i->cfgframe->plotstyle());
-          dataWidget->updateData();	
+          dataWidget->updateData();
           dataWidget->updateNormals();
        }
       }
       ++i;
     }
   }
-  dataWidget->updateGL();
+  dataWidget->update();
 }
 
 int MainWindow::findPlotletPosition( const ConfigFrame* val ) const
 {
   PM_CIT i = pmanager.begin();
-  while (i != pmanager.end()) 
+  while (i != pmanager.end())
   {
     if (i->cfgframe == val)
       return i->pos;

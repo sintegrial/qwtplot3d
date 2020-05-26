@@ -1,6 +1,6 @@
   #include <qapplication.h>
   #include <qwt3d_graphplot.h>
-  
+
   using namespace Qwt3D;
 
   class Plot : public GraphPlot
@@ -36,12 +36,12 @@
     setCoordinateStyle(NOCOORD);
 
     updateData();
-    updateGL();
+    update();
   }
 
   void Plot::createCube(double length, const Triple& shift)
   {
-    
+
     unsigned m = nodes.size();
     nodes.push_back(Triple(0,0,0)+shift);
     nodes.push_back(Triple(0,0,length)+shift);
@@ -57,7 +57,7 @@
     edges.push_back(Edge(m+2, m+3));
     edges.push_back(Edge(m+3, m+0));
 
-    unsigned n = 4; 
+    unsigned n = 4;
 
     edges.push_back(Edge(m+0+n, m+1+n));
     edges.push_back(Edge(m+1+n, m+2+n));
@@ -69,13 +69,13 @@
     edges.push_back(Edge(m+2, m+2+n));
     edges.push_back(Edge(m+3, m+3+n));
   }
-  
+
   void Plot::createCubic1()
   {
     unsigned xs = 2;
     unsigned ys = xs;
     unsigned zs = xs;
-    double stretch = 1.3;      
+    double stretch = 1.3;
 
     unsigned i,j,k;
     for (i=0; i!=xs; ++i)
@@ -103,10 +103,10 @@
     for (i=0; i!=nodes.size()-1; ++i)
     {
       edges.push_back(Edge(i,i+1));
-    } 
+    }
     createDataset(nodes, edges);
   }
-  
+
   void Plot::createCubic3()
   {
     createCube(1, Triple(0,0,0));

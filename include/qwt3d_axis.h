@@ -10,7 +10,7 @@
 namespace Qwt3D
 {
 
-//! Autoscalable axis with caption. 
+//! Autoscalable axis with caption.
 /*!
   Axes are highly customizable especially in terms
   of labeling and scaling.
@@ -23,20 +23,20 @@ public:
   Axis(); //!< Constructs standard axis
   Axis(Qwt3D::Triple beg, Qwt3D::Triple end); //!< Constructs a new axis with specified limits
   virtual ~Axis(); // dtor
-  
+
   virtual void draw(); //!< Draws axis
 
-  /** 
+  /**
   Used to tag the axis as a z-axis. This information is used to draw correct labels.
   The standard value for axes is false;
   */
-  void setZ(bool val) {isZ_=val;} 
+  void setZ(bool val) {isZ_=val;}
   bool isZ() const {return isZ_;} //!< Is a z-axis
 
   void setPosition(const Qwt3D::Triple& beg, const Qwt3D::Triple& end); //!< Positionate axis
   void position(Qwt3D::Triple& beg, Qwt3D::Triple& end) const {beg = beg_; end = end_;} //!< Returns axis' position
   Qwt3D::Triple begin() const { return beg_; } //!< Returns axis' beginning position
-  Qwt3D::Triple end() const { return end_; } //!< Returns axis' ending position 
+  Qwt3D::Triple end() const { return end_; } //!< Returns axis' ending position
   double length() const { return (end_-beg_).length(); } //!< Returns axis' length
 
   void setTicLength(double majorl, double minorl); //!< Sets tics lengths in world coordinates
@@ -45,13 +45,13 @@ public:
   void setTicOrientation(double tx, double ty, double tz); //!< Sets tic orientation
   void setTicOrientation(const Qwt3D::Triple& val); //!< Same function as above
   Qwt3D::Triple ticOrientation() const { return orientation_;} //!< Returns tic orientation
-  void setSymmetricTics( bool b) { symtics_ = b;} //!< Sets two-sided tics (default is false) 
-    
+  void setSymmetricTics( bool b) { symtics_ = b;} //!< Sets two-sided tics (default is false)
+
   //! Sets font for axis label
   void setLabelFont(QString const& family, int pointSize, int weight = QFont::Normal, bool italic = false);
   void setLabelFont(QFont const& font); //!< Sets font for axis label
-  QFont const& labelFont() const {return labelfont_;} //!< Returns current label font 
-  
+  QFont const& labelFont() const {return labelfont_;} //!< Returns current label font
+
   void setLabelString(QString const& name);   //!< Sets label content
   void setLabelPosition(const Qwt3D::Triple& pos, Qwt3D::ANCHOR);
   void setLabelColor(Qwt3D::RGBA col);
@@ -82,7 +82,7 @@ public:
   int minors() const { return minorintervals_; } //!< Returns number of minor intervals
   Qwt3D::TripleVector const& majorPositions() const {return majorpos_;} //!< Returns positions for actual major tics (also if invisible)
   Qwt3D::TripleVector const& minorPositions() const {return minorpos_;} //!< Returns positions for actual minor tics (also if invisible)
-  
+
   //! Sets line width for axis components
   void setLineWidth(double val, double majfac = 0.9, double minfac = 0.5);
   double lineWidth() const { return lineWidth_;} //!< Returns line width for axis body
@@ -90,7 +90,7 @@ public:
   double minLineWidth() const { return minLineWidth_;} //!< Returns Line width for minor tics
 
   void setLimits(double start, double stop) {start_=start; stop_=stop;} //!< Sets interval
-  void limits(double& start, double& stop) const {start = start_; stop = stop_;} //!< Returns axis interval
+  void limits(double& start, double& stop) const; //!< Returns axis interval
   void recalculateTics(); //!< Enforces recalculation of ticmark positions
 
 
@@ -105,8 +105,8 @@ private:
   bool prepTicCalculation(Triple& startpoint);
 
   Qwt3D::Triple biggestNumberString();
-  
-  
+
+
   Qwt3D::ANCHOR scaleNumberAnchor_;
   Qwt3D::Label label_;
   std::vector<Qwt3D::Label> markerLabel_;
@@ -129,13 +129,13 @@ private:
   QFont numberfont_, labelfont_;
   Qwt3D::RGBA  numbercolor_;
 
-  int numbergap_, labelgap_; 
+  int numbergap_, labelgap_;
 
   Qwt3D::ValuePtr<Qwt3D::Scale> scale_;
 
   bool isZ_; // identify z-axis
 };
 
-} // ns 
+} // ns
 
 #endif /* include guard */
