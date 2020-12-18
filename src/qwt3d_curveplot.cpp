@@ -30,8 +30,8 @@ void CurvePlot::nurbsError(GLenum errorCode)
     qWarning("Nurbs Error: %s \n", estring);
 }
 
-CurvePlot::CurvePlot(QWidget *parent, const QGLWidget *shareWidget)
-    : Plot3D(parent, shareWidget)
+CurvePlot::CurvePlot(QWidget *parent)
+    : Plot3D(parent)
     , mGLU_Nurb(gluNewNurbsRenderer())
     , mKnotCount(0)
     , mKnots(Q_NULLPTR)

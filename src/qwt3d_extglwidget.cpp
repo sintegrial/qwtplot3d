@@ -17,9 +17,9 @@ using namespace Qwt3D;
 /*!
   This should be the first call in your derived classes constructors.
 */
-ExtGLWidget::ExtGLWidget( QWidget * parent, const QGLWidget * shareWidget)
-    : QGLWidget( parent, shareWidget)
-{  
+ExtGLWidget::ExtGLWidget( QWidget * parent)
+    : QOpenGLWidget( parent )
+{
     initializedGL_ = false;
     xRot_ = yRot_ = zRot_ = 0.0;		// default object rotation
 
@@ -225,14 +225,14 @@ void ExtGLWidget::assignMouse(MouseState xrot, MouseState yrot, MouseState zrot,
     yshift_mstate_ =  yshift;
 }
 
-/** 
+/**
 The function has no effect if you derive from ExtGLWidget and overrides the mouse Function too careless.
 In this case check first against mouseEnabled() in your version of mouseMoveEvent() and wheelEvent().
-A more fine grained input control can be achieved by combining assignMouse() with enableMouse(). 
+A more fine grained input control can be achieved by combining assignMouse() with enableMouse().
 */
 void ExtGLWidget::enableMouse(bool val) {mouse_input_enabled_ = val;}
 
-/** 
+/**
 \see enableMouse()
 */
 void ExtGLWidget::disableMouse(bool val) {mouse_input_enabled_ = !val;}
@@ -394,14 +394,14 @@ void ExtGLWidget::assignKeyboard(
     yshift_kstate_[1] =  yshift_p;
 }
 
-/** 
+/**
 The function has no effect if you derive from ExtGLWidget and overrides the keyboard Functions too careless.
 In this case check first against keyboardEnabled() in your version of keyPressEvent()
-A more fine grained input control can be achieved by combining assignKeyboard() with enableKeyboard(). 
+A more fine grained input control can be achieved by combining assignKeyboard() with enableKeyboard().
 */
 void ExtGLWidget::enableKeyboard(bool val) {kbd_input_enabled_ = val;}
 
-/** 
+/**
 \see enableKeyboard()
 */
 void ExtGLWidget::disableKeyboard(bool val) {kbd_input_enabled_ = !val;}
@@ -443,7 +443,7 @@ void ExtGLWidget::setRotation( double xVal, double yVal, double zVal )
     yRot_ = yVal;
     zRot_ = zVal;
 
-    updateGL();
+    update();
     emit rotationChanged(xVal, yVal, zVal);
 }
 
@@ -462,7 +462,7 @@ void ExtGLWidget::setShift( double xVal, double yVal, double zVal )
     xShift_ = xVal;
     yShift_ = yVal;
     zShift_ = zVal;
-    updateGL();
+    update();
     emit shiftChanged(xVal, yVal, zVal);
 }
 
@@ -484,7 +484,7 @@ void ExtGLWidget::setViewportShift( double xVal, double yVal )
     xVPShift_ = xVal;
     yVPShift_ = yVal;
 
-    updateGL();
+    update();
     emit vieportShiftChanged(xVPShift_, yVPShift_);
 }
 
@@ -505,7 +505,7 @@ void ExtGLWidget::setScale( double xVal, double yVal, double zVal )
     yScale_ = (yVal < DBL_EPSILON ) ? DBL_EPSILON : yVal;
     zScale_ = (zVal < DBL_EPSILON ) ? DBL_EPSILON : zVal;
 
-    updateGL();
+    update();
     emit scaleChanged(xVal, yVal, zVal);
 }
 
@@ -519,7 +519,7 @@ void ExtGLWidget::setZoom( double val )
         return;
 
     zoom_ = (val < DBL_EPSILON ) ? DBL_EPSILON : val;
-    updateGL();
+    update();
     emit zoomChanged(val);
 }
 
@@ -531,7 +531,7 @@ void ExtGLWidget::setOrtho( bool val )
     if (val == ortho_)
         return;
     ortho_ = val;
-    updateGL();
+    update();
 
     emit projectionChanged(val);
 }
@@ -550,7 +550,7 @@ void ExtGLWidget::initializeGL()
     disableLighting();
 
     GLfloat whiteAmb[4] = {1.0, 1.0, 1.0, 1.0};
-    
+
     setLightShift(0, 0, 3000);
     glEnable(GL_COLOR_MATERIAL);
 

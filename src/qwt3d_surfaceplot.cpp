@@ -6,9 +6,9 @@ using namespace Qwt3D;
 /**
 Initializes with dataNormals()==false //todo
 */
-SurfacePlot::SurfacePlot( QWidget * parent, const QGLWidget * shareWidget)
-    : Plot3D( parent, shareWidget)
-{  
+SurfacePlot::SurfacePlot( QWidget * parent )
+    : Plot3D( parent )
+{
     floorstyle_ = NOFLOOR;
     datanormals_p = false;
     normalLength_p = 0.02;
@@ -31,9 +31,9 @@ void SurfacePlot::setNormalLength(double val)
 }
 
 /**
-Values < 3 are ignored 
+Values < 3 are ignored
 */
-void SurfacePlot::setNormalQuality(int val) 
+void SurfacePlot::setNormalQuality(int val)
 {
     if (val<3)
         return;

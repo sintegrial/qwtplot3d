@@ -1,13 +1,7 @@
-CONFIG           += qt warn_on thread static
+CONFIG           += qt warn_on thread static release
 QT               += opengl
 
-win32 {
-  !build_pass {
-    win32-msvc | win32-msvc2002 {
-      error(Unsupported Visual Studio version ( < 2003 ))
-    }
-  }
-  
+win32 { 
   #win32-msvc2003 | win32-msvc2005 | win32-msvc2008 {
   #  TEMPLATE    = vclib
   #  CONFIG     += dll exceptions
@@ -22,14 +16,12 @@ win32 {
   #  }
   #}
 
-  win32-msvc2003 | win32-msvc2005 | win32-msvc2008 | win32-msvc2010 {
-    QMAKE_CXXFLAGS += -MP
-    QMAKE_CXXFLAGS += $$QMAKE_CFLAGS_STL
-    QMAKE_CXXFLAGS += -fp:fast -arch:SSE2
+  QMAKE_CXXFLAGS += -MP
+  QMAKE_CXXFLAGS += $$QMAKE_CFLAGS_STL
+  QMAKE_CXXFLAGS += -fp:fast -arch:SSE2
 
-    #test - asm output
-    QMAKE_CXXFLAGS += -FAs
-  }
+  #test - asm output
+  QMAKE_CXXFLAGS += -FAs
 }
 
 linux-g++:QMAKE_CXXFLAGS += -fno-exceptions

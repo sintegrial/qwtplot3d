@@ -427,10 +427,7 @@ void CoordinateSystem::setAutoScale(bool val)
 
 void CoordinateSystem::setAxesColor(RGBA val)
 {
-    axes[0].setColor(RGBA(255,0,0));
-    axes[1].setColor(RGBA(0,255,0));
-    axes[2].setColor(RGBA(0,0,255));
-    for (unsigned i=3; i!=axes.size(); ++i)
+    for (unsigned i=0; i!=axes.size(); ++i)
         axes[i].setColor(val);
 }
 

@@ -26,8 +26,8 @@ MeshPlot::MeshData::~MeshData()
 /**
 Initializes with dataNormals()==false, NOFLOOR, resolution() == 1
 */
-MeshPlot::MeshPlot( QWidget * parent, const QGLWidget * shareWidget)
-    : SurfacePlot( parent, shareWidget)
+MeshPlot::MeshPlot( QWidget * parent )
+    : SurfacePlot( parent )
 {
     plotlets_p[0].data = ValuePtr<Data>(new MeshData);
 }
@@ -49,7 +49,7 @@ void MeshPlot::setColorFromVertex(const Plotlet& pl, int node, bool skip)
 
 
 void MeshPlot::data2Floor(const Plotlet& pl)
-{	
+{
     const MeshData& data = dynamic_cast<const MeshData&>(*pl.data);
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -174,7 +174,7 @@ void MeshPlot::createNormals(const Plotlet& pl)
     arrow.drawEnd();
 }
 
-/*! 
+/*!
 Convert user (non-rectangular) mesh based data to internal structure.
 See also Qwt3D::TripleVector and Qwt3D::CellVector
 
@@ -183,7 +183,7 @@ be replaced by the new data. This includes destruction of possible additional da
 \return Index of new entry in dataset array (append == true), 0 (append == false) or -1 for errors
 */
 int MeshPlot::createDataset(TripleVector const& data, CellVector const& poly, bool append /*= false*/)
-{	
+{
     int ret = prepareDatasetCreation<MeshData>(append);
     if (ret < 0)
         return -1;
@@ -226,7 +226,7 @@ int MeshPlot::createDataset(TripleVector const& data, CellVector const& poly, bo
     createCoordinateSystem();
 
     return ret;
-}	
+}
 
 void MeshPlot::createOpenGlData(const Plotlet& pl)
 {

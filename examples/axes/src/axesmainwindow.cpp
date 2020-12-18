@@ -52,11 +52,11 @@ AxesMainWindow::AxesMainWindow( QWidget* parent)
 
 
 	rosenbrock = new Rosenbrock(*plot);
-	
+
 	rosenbrock->setMesh(31,33);
 	rosenbrock->setDomain(-1.73,1.8,-1.9,1.8);
 	rosenbrock->setMinZ(-100);
-	
+
 	rosenbrock->create();
 
 	for (unsigned i=0; i!=plot->coordinates()->axes.size(); ++i)
@@ -86,8 +86,8 @@ AxesMainWindow::AxesMainWindow( QWidget* parent)
 	plot->coordinates()->axes[X4].setLabelString("X4");
 	plot->coordinates()->axes[Y4].setLabelString("Y4");
 	plot->coordinates()->axes[Z4].setLabelString("Z4");
-  
-  
+
+
   plot->coordinates()->setLineSmooth(true);
   smoothBox->setDown(true);
 
@@ -97,12 +97,12 @@ AxesMainWindow::AxesMainWindow( QWidget* parent)
   Items->addAction( "&Letter", this, SLOT(letterItems()), QKeySequence("ALT+L") );
   Items->addAction( "&Time", this, SLOT(timeItems()), QKeySequence("ALT+T") );
   Items->addAction( "&Log", this, SLOT(customScale()), QKeySequence("ALT+C") );
-  
+
   plot->makeCurrent();
 	plot->updateData();
-  plot->updateGL();
+  plot->update();
 
-	connect(smoothBox, SIGNAL(toggled(bool)), this, SLOT(setSmoothLines(bool)) );	
+	connect(smoothBox, SIGNAL(toggled(bool)), this, SLOT(setSmoothLines(bool)) );
 	connect(numbergapslider, SIGNAL(valueChanged(int)), this, SLOT(setNumberGap(int)) );
 	connect(labelgapslider, SIGNAL(valueChanged(int)), this, SLOT(setLabelGap(int)) );
 	connect(ticLengthSlider, SIGNAL(valueChanged(int)), this, SLOT(setTicLength(int)) );
@@ -126,20 +126,20 @@ void AxesMainWindow::setNumberGap(int gap)
 {
 	plot->coordinates()->adjustNumbers(gap);
   plot->makeCurrent();
-  plot->updateGL();
+  plot->update();
 }
 
 void AxesMainWindow::setLabelGap(int gap)
 {
 	plot->coordinates()->adjustLabels(gap);
   plot->makeCurrent();
-  plot->updateGL();
+  plot->update();
 }
 
 void AxesMainWindow::setSmoothLines(bool val)
 {
   plot->coordinates()->setLineSmooth(val);
-  plot->updateGL();
+  plot->update();
 }
 
 void AxesMainWindow::setTicLength(int val)
@@ -147,13 +147,13 @@ void AxesMainWindow::setTicLength(int val)
   double majl =  (plot->coordinates()->second()-plot->coordinates()->first()).length() / 1000.;
 	majl = majl * val;
 	plot->coordinates()->setTicLength(majl,0.6*majl);
-  plot->updateGL();
+  plot->update();
 }
 
 void AxesMainWindow::setTicNumber(int degree)
 {
   plot->coordinates()->axes[X1].setMajors(tics + degree);
-  plot->updateGL();
+  plot->update();
 }
 
 void AxesMainWindow::resetTics()
@@ -168,13 +168,13 @@ void AxesMainWindow::resetTics()
 }
 
 void AxesMainWindow::standardItems()
-{  
+{
   resetTics();
-  plot->updateGL();
+  plot->update();
 }
 
 void AxesMainWindow::letterItems()
-{  
+{
   resetTics();
   ticNumberSlider->setEnabled(true);
   plot->coordinates()->axes[X1].setAutoScale(false);
@@ -188,31 +188,31 @@ void AxesMainWindow::letterItems()
   plot->coordinates()->axes[Y3].setScale(new Letter(false));
   plot->coordinates()->axes[Y4].setScale(new Letter(false));
 	plot->setTitle("Use the tics slider for this example!");
-  plot->updateGL();
+  plot->update();
 }
 
 void AxesMainWindow::complexItems()
-{  
+{
   resetTics();
   plot->coordinates()->axes[Y1].setScale(new Imaginary);
   plot->coordinates()->axes[Y2].setScale(new Imaginary);
   plot->coordinates()->axes[Y3].setScale(new Imaginary);
   plot->coordinates()->axes[Y4].setScale(new Imaginary);
-  plot->updateGL();
+  plot->update();
 }
 
 void AxesMainWindow::timeItems()
-{  
+{
   resetTics();
   plot->coordinates()->axes[Z1].setScale(new TimeItems);
   plot->coordinates()->axes[Z2].setScale(new TimeItems);
   plot->coordinates()->axes[Z3].setScale(new TimeItems);
   plot->coordinates()->axes[Z4].setScale(new TimeItems);
-  plot->updateGL();
+  plot->update();
 }
 
 void AxesMainWindow::customScale()
-{  
+{
   resetTics();
   plot->coordinates()->axes[Z1].setScale(LOG10SCALE);
   plot->coordinates()->axes[Z3].setScale(LOG10SCALE);
@@ -223,9 +223,9 @@ void AxesMainWindow::customScale()
 //  plot->coordinates()->axes[Z2].setAutoScale(false);
 //  plot->coordinates()->axes[Z3].setAutoScale(false);
 //  plot->coordinates()->axes[Z4].setAutoScale(false);
-  
+
   plot->coordinates()->setGridLines(true,true,Qwt3D::BACK);
 
-  plot->updateGL();
+  plot->update();
 }
 

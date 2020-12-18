@@ -14,8 +14,8 @@ class QWT3D_EXPORT GraphPlot : public Plot3D
 //    Q_OBJECT
 
 public:
-    GraphPlot( QWidget * parent = 0, const QGLWidget * shareWidget = 0 );
- 
+    GraphPlot( QWidget * parent = 0 );
+
     int createDataset(Qwt3D::TripleVector const& nodes, Qwt3D::EdgeVector const& edges, bool append = false);
 
 protected:

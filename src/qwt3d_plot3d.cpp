@@ -20,10 +20,10 @@ Qwt3D::Plot3D::Plotlet::Plotlet(Data* d, const Appearance& a)
 /*!
   This should be the first call in your derived classes constructors.
 */
-Plot3D::Plot3D(QWidget * parent, const QGLWidget * shareWidget)
-    : ExtGLWidget(parent, shareWidget),
+Plot3D::Plot3D(QWidget * parent)
+    : ExtGLWidget(parent),
 	m_fastNormals(false)
-{  
+{
     plotlets_p.push_back(Plotlet(0));
     renderpixmaprequest_ = false;
     isolinesZ_p.resize(10);
@@ -70,10 +70,14 @@ void Plot3D::initializeGL()
 }
 
 //! Reimplements QGLWidget::renderPixmap
-QPixmap Plot3D::renderPixmap(int w/* =0 */, int h/* =0 */, bool useContext/* =false */)
+QPixmap Plot3D::renderPixmap(int w/* =0 */, int h/* =0 */)
 {
     renderpixmaprequest_ = true;
-    return QGLWidget::renderPixmap(w,h,useContext);
+    QImage img(grabFramebuffer());
+    if (w || h) {
+		img = img.scaled(w, h);
+	}
+    return QPixmap::fromImage(img);
 }
 
 /*!
@@ -222,7 +226,15 @@ void Plot3D::showColorLegend(bool show, unsigned idx /* = 0 */)
         return;
     if (show)
         plotlets_p[idx].appearance->dataColor()->createVector(legend_.colors);
-    updateGL();
+    update();
+}
+
+/*!
+  Returns pointer to ColorLegend object
+*/
+Qwt3D::ColorLegend* Plot3D::legend()
+{
+	return &legend_;
 }
 
 void Plot3D::setMeshColor(RGBA rgba)
@@ -235,6 +247,10 @@ void Plot3D::setBackgroundColor(RGBA rgba)
     bgcolor_ = rgba;
 }
 
+bool Plot3D::hasData() const
+{
+    return plotlets() > 0 && !plotlets_p[0].data->empty();
+}
 
 /*!
     Assign a new coloring object for the data.
@@ -250,7 +266,7 @@ void Plot3D::setDataColor(const Qwt3D::Color& col)
 void Plot3D::setCoordinateStyle(COORDSTYLE st)
 {
     coordinates_p.setStyle(st);
-    updateGL();
+    update();
 }
 
 /*!
@@ -276,7 +292,7 @@ Qwt3D::Enrichment* Plot3D::setPlotStyle(Qwt3D::Enrichment const& obj)
 void Plot3D::setShading(SHADINGSTYLE val)
 {
     appearance(0).setShading(val);
-    updateGL();
+    update();
 }
 
 /*!
@@ -309,7 +325,7 @@ void Plot3D::setTitlePosition(double rely, double relx, Qwt3D::ANCHOR anchor)
 Set caption font
 */
 void Plot3D::setTitleFont(const QString& family, int pointSize, int weight, bool italic)
-{ 
+{
     title_.setFont(family, pointSize, weight, italic);
 }
 
@@ -338,13 +354,14 @@ void Plot3D::updateData()
 
     glEndList();
 
+	doneCurrent();
     //m_createTime = timer.elapsed();
 }
 
-/** 
-The function is called from updateData before a new internal OpenGL representations 
-will be recreated, but after the new hull has been calculated. The update() function 
-for every Appearance list member is called by this function. 
+/**
+The function is called from updateData before a new internal OpenGL representations
+will be recreated, but after the new hull has been calculated. The update() function
+for every Appearance list member is called by this function.
 So - for example - the Appearance's color part can adapt himself to new z ranges.
 */
 void Qwt3D::Plot3D::updateAppearances()

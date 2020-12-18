@@ -10,14 +10,14 @@ namespace Qwt3D
 //! A class representing  grid-generated surfaces
 /**
   A GridPlot ...
-  
+
 */
 class QWT3D_EXPORT GridPlot : public SurfacePlot
 {
     Q_OBJECT
 
 public:
-    GridPlot(QWidget* parent = 0, const QGLWidget* shareWidget = 0);
+    GridPlot(QWidget* parent = 0);
     virtual ~GridPlot() {}
 
     int	resolution() const {return resolution_p;} //!< Returns data resolution (1 means all data)
@@ -27,14 +27,14 @@ public:
     int createDataset(double** data, unsigned int columns, unsigned int rows,
                       double minx, double maxx, double miny, double maxy, bool append = false);
 
-	/**		
+	/**
 		Sets number of rendering threads using glDrawArrays to \a count (1..10, 8 by default).
 		If \a count = 0, the older (list based, slow) implementation will be used.
 		\since 0.3.2
 		\sa renderThreadsCount
 	*/
 	void setRenderThreadsCount(int count);
-	/**		
+	/**
 		Returns number of rendering threads using glDrawArrays (8 by default).
 		If this value is 0, the older (list based, slow) implementation is used.
 		\since 0.3.2
@@ -48,7 +48,7 @@ signals:
 public slots:
     void setResolution(int);
 
-protected:  
+protected:
     virtual void createOpenGlData(const Plotlet& pl);
 	virtual void drawOpenGlData();
 	void processVertex(const Triple& vert1, const Triple& norm1, const Color& colorData, bool hl, bool& stripStarted, RGBA& lastColor) const;
@@ -92,7 +92,7 @@ protected:
 	public:
 		CVertexProcessor();
 
-		void setup(int dataWidth, int dataLength, const GridData& data, int row, int step, 
+		void setup(int dataWidth, int dataLength, const GridData& data, int row, int step,
 			bool useColorMap, const Qwt3D::RGBA& fixedColor, const Color* colorData = NULL,
 			bool showMesh = false, const Qwt3D::RGBA& meshColor = Qwt3D::RGBA(0,0,0,0));
 

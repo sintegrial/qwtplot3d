@@ -43,11 +43,11 @@ Plot::Plot(QWidget *parent)
 : GridPlot(parent)
 {
   setTitle("A Simple GridPlot Demonstration");
-  
+
   Sphere sphere(*this);
   sphere.create();
 
-  reset();  
+  reset();
   assignMouse(Qt::LeftButton,
     Qt::RightButton,
     Qt::LeftButton,
@@ -104,7 +104,7 @@ void Pointer::draw()
 	glGetIntegerv(GL_MATRIX_MODE, &mode);
 	glMatrixMode( GL_MODELVIEW );
   glPushMatrix();
-  
+
   glColor3d(1,0,0);
   glBegin(GL_LINES);
     glVertex3d(pos_.x, pos_.y, pos_.z);
@@ -123,7 +123,7 @@ LightingDlg::LightingDlg(QWidget *parent)
   QGridLayout *grid = new QGridLayout( frame);
 
   dataPlot = 0;
-  
+
   plot = new Plot(frame);
   plot->updateData();
 
@@ -148,54 +148,54 @@ void LightingDlg::setEmission(int val)
   if (!dataPlot)
     return;
   dataPlot->setMaterialComponent(GL_EMISSION, val / 100.);
-  dataPlot->updateGL();
+  dataPlot->update();
 }
 void LightingDlg::setDiff(int val)
 {
   if (!dataPlot)
     return;
   dataPlot->setLightComponent(GL_DIFFUSE, val / 100.);
-  dataPlot->updateGL();
+  dataPlot->update();
 }
 void LightingDlg::setSpec(int val)
 {
   if (!dataPlot)
     return;
   dataPlot->setMaterialComponent(GL_SPECULAR, val / 100.);
-  dataPlot->updateGL();
+  dataPlot->update();
 }
 void LightingDlg::setShin(int val)
 {
   if (!dataPlot)
     return;
   dataPlot->setShininess( val / 100.);
-  dataPlot->updateGL();
+  dataPlot->update();
 }
 
 void LightingDlg::reset()
 {
   plot->reset();
   if (dataPlot)
-    dataPlot->updateGL();
+    dataPlot->update();
 }
 
 void LightingDlg::setDistance(int val)
 {
-  
+
   plot->stick->setPos(0,0,val/100.);
   plot->updateData();
-  plot->updateGL();
-  
+  plot->update();
+
   double drad = (dataPlot->hull().maxVertex-dataPlot->hull().minVertex).length();
   drad *= val/20.;
 
   dataPlot->setLightShift(drad,drad,drad);
-  dataPlot->updateGL();
+  dataPlot->update();
 }
 
-void LightingDlg::assign(Qwt3D::Plot3D* pl) 
+void LightingDlg::assign(Qwt3D::Plot3D* pl)
 {
-  if (!pl) 
+  if (!pl)
     return;
   dataPlot = pl;
 }
@@ -204,8 +204,8 @@ void LightingDlg::setRotation(double x, double y, double z)
 {
   if (!dataPlot)
     return;
-  
+
   setDistance(distSL->value());
   dataPlot->setLightRotation(x,y,z);
-  dataPlot->updateGL();
+  dataPlot->update();
 }

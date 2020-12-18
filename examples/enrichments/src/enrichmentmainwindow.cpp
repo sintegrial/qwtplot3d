@@ -19,7 +19,7 @@ public:
 	:Function(pw)
 	{
 	}
-	
+
 	double operator()(double x, double y)
 	{
     double ret = 1.0 / (x*x+y*y+0.5);
@@ -48,9 +48,9 @@ EnrichmentMainWindow::EnrichmentMainWindow( QWidget* parent )
   bar = (Bar*)plot->setPlotStyle(Bar(0.007,0.5));
 
   hat = new Hat(*plot);
-	
+
 	hat->setMesh(23,21);
-	hat->setDomain(-1.8,1.7,-1.6,1.7);	
+	hat->setDomain(-1.8,1.7,-1.6,1.7);
 
 	hat->create();
 
@@ -66,10 +66,10 @@ EnrichmentMainWindow::EnrichmentMainWindow( QWidget* parent )
 	plot->coordinates()->setLineWidth(1);
 	plot->coordinates()->setNumberFont("Courier",8);
   plot->coordinates()->adjustNumbers(5);
- 
+
 	setColor();
   plot->updateData();
-  plot->updateGL();
+  plot->update();
 
 
   levelSlider->setValue(50);
@@ -91,19 +91,19 @@ EnrichmentMainWindow::~EnrichmentMainWindow()
 
 
 void EnrichmentMainWindow::setColor()
-{	
+{
   Qwt3D::ColorVector cv;
-	
+
 	RGBA rgb;
 	int i = 252;
 	int step = 4;
 
   while (i>=0)
-  {    
+  {
     rgb.r = i/255.; rgb.g=(i-60>0) ? (i-60)/255.:0;rgb.b=0;
   //  rgb.a = 0.2;
-    cv.push_back(rgb);	
-    if (!--step) 
+    cv.push_back(rgb);
+    if (!--step)
     {
       i-=4;
       step=4;
@@ -111,7 +111,7 @@ void EnrichmentMainWindow::setColor()
   }
 	StandardColor col;
 	col.setColorVector(cv);
-	
+
 	plot->setDataColor(col);
 }
 
@@ -121,7 +121,7 @@ void EnrichmentMainWindow::setLevel(int i)
   level_ = 1 - i / 100.;
   bar->configure(width_,level_);
   plot->updateData();
-  plot->updateGL();
+  plot->update();
 }
 
 void EnrichmentMainWindow::setWidth(int i)
@@ -129,13 +129,13 @@ void EnrichmentMainWindow::setWidth(int i)
   width_ = i / 20000.;
   bar->configure(width_,level_);
   plot->updateData();
-  plot->updateGL();
+  plot->update();
 }
 
 void EnrichmentMainWindow::barSlot()
-{  
-  Bar b(width_,level_); 
+{
+  Bar b(width_,level_);
   bar = (Bar*)plot->setPlotStyle(b);
   plot->updateData();
-  plot->updateGL();
+  plot->update();
 }

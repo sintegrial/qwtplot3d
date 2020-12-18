@@ -1,4 +1,4 @@
 qwtplot3d
 =========
 
-Extended version of the original QwtPlot3D library
+Modified version of the original sintegrial/QwtPlot3D library to use QOpenGLWidget

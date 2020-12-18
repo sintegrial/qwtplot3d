@@ -1,5 +1,5 @@
 TEMPLATE     = app
-CONFIG      += qt warn_on thread
+CONFIG      += qt warn_on thread release
 QT += opengl
 UI_DIR = tmp
 MOC_DIR      = tmp
@@ -9,10 +9,8 @@ DEPENDPATH	= $$INCLUDEPATH
 DESTDIR = ../bin
 
 win32{
-  win32-msvc2008 | win32-msvc2010 | win32-msvc2012 | win32-msvc2013 | win32-msvc2015 {
     QMAKE_CXXFLAGS += -MP
     QMAKE_CXXFLAGS += $$QMAKE_CFLAGS_STL
-  }
 
     LIBS += -L../../lib -lqwtplot3d -lopengl32 -lglu32 -lgdi32
 }

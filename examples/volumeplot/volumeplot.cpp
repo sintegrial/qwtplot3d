@@ -95,7 +95,7 @@ Plot::Plot(): VolumePlot()
     setCoordinateStyle(FRAME);
 
     updateData();
-    updateGL();
+    update();
 }
 
 int main(int argc, char **argv)

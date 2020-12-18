@@ -1,6 +1,6 @@
 #if defined(_MSC_VER) /* MSVC Compiler */
 /* 'identifier' : truncation from 'type1' to 'type2' */
-#pragma warning ( disable : 4305 ) 
+#pragma warning ( disable : 4305 )
 #endif
 
 
@@ -12,7 +12,7 @@ using namespace Qwt3D;
 // Data class (private)
 
 
-GraphPlot::GraphData::GraphData() 
+GraphPlot::GraphData::GraphData()
 {
   datatype_p=Qwt3D::GRAPH;
   setHull(ParallelEpiped());
@@ -33,8 +33,8 @@ bool GraphPlot::GraphData::empty() const
 // Data class end
 
 
-GraphPlot::GraphPlot( QWidget * parent, const QGLWidget * shareWidget)
-: Plot3D( parent, shareWidget) 
+GraphPlot::GraphPlot( QWidget * parent )
+: Plot3D( parent )
 {
   plotlets_p[0].data = ValuePtr<Data>(new GraphData);
 }
@@ -62,7 +62,7 @@ void GraphPlot::createOpenGlData(const Plotlet& pl)
   // 	if (plotStyle() != WIREFRAME)
   // 	{
   // 		glPolygonMode(GL_FRONT_AND_BACK, GL_QUADS);
-  // 
+  //
   // 		bool hl = (plotStyle() == HIDDENLINE);
   // 		if (hl)
   // 		{
@@ -71,7 +71,7 @@ void GraphPlot::createOpenGlData(const Plotlet& pl)
   // 		}
 
   /*
-  RGBA col(0.8,0,0);    
+  RGBA col(0.8,0,0);
   glColor4d(col.r, col.g, col.b, col.a);
   glBegin(GL_LINES);
   for (unsigned i=0; i!=data_->edges.size(); ++i)
@@ -84,7 +84,7 @@ void GraphPlot::createOpenGlData(const Plotlet& pl)
   }
   glEnd();
 
-  col = RGBA(0,0,0.5);    
+  col = RGBA(0,0,0.5);
   glColor4d(col.r, col.g, col.b, col.a);
   setDevicePointSize( 4 );
   glBegin(GL_POINTS);
@@ -111,7 +111,7 @@ void GraphPlot::createOpenGlData(const Plotlet& pl)
   Ball b((hull().maxVertex-hull().minVertex).length() / 50, 32);
   //static bool ff = true;
   //if (ff)
-  b.setColor(RGBA(0.5,0,0));    
+  b.setColor(RGBA(0.5,0,0));
   //else
   //  b.setColor(RGBA(0,0.5,0));
   //ff = !ff;
@@ -124,7 +124,7 @@ void GraphPlot::createOpenGlData(const Plotlet& pl)
   //	}
 }
 
-/*! 
+/*!
 Convert user defined graph data to internal structure.
 See also Qwt3D::TripleVector and Qwt3D::EdgeVector
 
@@ -133,7 +133,7 @@ be replaced by the new data. This includes destruction of possible additional da
 \return Index of new entry in dataset array (append == true), 0 (append == false) or -1 for errors
 */
 int GraphPlot::createDataset(TripleVector const& nodes, EdgeVector const& edges, bool append /*= false*/)
-{	
+{
 
   int ret = prepareDatasetCreation<GraphData>(append);
   if (ret < 0)
@@ -148,4 +148,4 @@ int GraphPlot::createDataset(TripleVector const& nodes, EdgeVector const& edges,
   createCoordinateSystem();
 
   return ret;
-}	
+}
