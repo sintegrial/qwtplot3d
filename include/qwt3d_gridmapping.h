@@ -23,11 +23,15 @@ public:
 	void setDomain(double minu, double maxu, double minv, double maxv); //!< Sets u-v domain boundaries.
   void restrictRange(Qwt3D::ParallelEpiped const&); //!< Restrict the mappings range to the parallelepiped 
 
+  int dataSetID() { return mDataSetID; };
+
 protected:
   Qwt3D::ParallelEpiped range_p;
   Qwt3D::GridPlot* plotwidget_p;
 	unsigned int umesh_p, vmesh_p;
 	double minu_p, maxu_p, minv_p, maxv_p;
+
+	int mDataSetID;
 };
 
 } // ns

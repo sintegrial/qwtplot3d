@@ -1044,6 +1044,13 @@ void GridPlot::processLineStripVertex(const Triple& vert1, bool& stripStarted) c
 
 void GridPlot::drawEnrichment(const Plotlet& pl, Enrichment& p)
 {
+	const Appearance& app = *pl.appearance;
+	if (app.plotStyle() == Qwt3D::POINTS)
+	{
+		Dot &dot = (Dot &)p;
+		dot.configure(app.pointSize(), false);
+		dot.setColor(app.dataColor());
+	}
     switch(p.type())
     {
         case Enrichment::USERENRICHMENT:

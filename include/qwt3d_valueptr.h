@@ -60,6 +60,7 @@ public:
   T&  operator*  () const  { return *rawptr_; }
   T*  operator-> () const  { return  rawptr_; }
 
+  bool isNull () const { return nullptr == rawptr_; }
 
 private:
   template<typename U>

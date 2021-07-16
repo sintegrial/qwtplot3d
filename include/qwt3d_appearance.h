@@ -39,6 +39,9 @@ public:
   */
   virtual void update(const Plot3D& plot);
   
+  void setPointSize(const double & pointSize);
+  double pointSize() const;
+
   void setPlotStyle(Qwt3D::PLOTSTYLE val); //!< Set plotting style
   Qwt3D::Enrichment* setPlotStyle( Qwt3D::Enrichment const& val); //!< Set user-defined plot style
   Qwt3D::PLOTSTYLE plotStyle() const { return appproxy_.plotstyle; }//!< Returns plotting style
@@ -91,6 +94,7 @@ private:
     double meshLineWidth;
     bool smoothdatamesh;
     Qwt3D::PLOTSTYLE plotstyle;
+	double mPointSize;
     Qwt3D::SHADINGSTYLE shading;
     double polygonOffset;
   };

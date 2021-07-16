@@ -3,6 +3,7 @@
 #define qwt3d_enrichment_std_h__2009_10_11_14_18_10_begin_guarded_code
 
 #include "qwt3d_enrichment.h"
+#include "qwt3d_color.h"
 
 namespace Qwt3D
 {
@@ -43,10 +44,14 @@ public:
   void drawEnd();
   void draw(Qwt3D::Triple const&);
 
+  void setColor(ValuePtr<Color> color);
+
 private:
   bool smooth_;
   double pointsize_;
   GLboolean oldstate_;
+
+  ValuePtr<Color> mColor;
 };
 
 //! The Ball Style
