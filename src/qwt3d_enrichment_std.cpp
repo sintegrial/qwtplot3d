@@ -163,9 +163,18 @@ void Dot::draw(Qwt3D::Triple const& pos)
     if (!IS_NAN(pos.z))
 	{
 		RGBA rgba = plot_p->dataColor()->rgba(pos);
+        if(!mColor.isNull())
+		{
+            rgba = mColor->rgba(pos);
+		}
 		glColor4d(rgba.r,rgba.g,rgba.b,rgba.a);
 		glVertex3d(pos.x, pos.y, pos.z);
 	}
+}
+
+void Qwt3D::Dot::setColor(ValuePtr<Color> color)
+{
+	mColor = color;
 }
 
 /////////////////////////////////////////////////////////////////

@@ -77,6 +77,16 @@ void Qwt3D::Appearance::update(const Plot3D& plot)
     datacolor_p->update(plot);
 }
 
+void Qwt3D::Appearance::setPointSize(const double & pointSize)
+{
+	appproxy_.mPointSize = pointSize;
+}
+
+double Qwt3D::Appearance::pointSize()const
+{
+	return appproxy_.mPointSize;
+}
+
 void Qwt3D::Appearance::setDataColor( const Color& col )
 {
     datacolor_p = ValuePtr<Color>(col.clone());

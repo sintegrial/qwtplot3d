@@ -10,6 +10,7 @@
 
 #include <QtGlobal>
 #include <math.h>
+#include <cmath>
 #define IS_NAN(x) std::isnan(x)
 
 

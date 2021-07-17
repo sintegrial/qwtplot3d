@@ -86,6 +86,7 @@ bool ParametricSurface::create(bool append /*= false*/)
 		}
 	}
 
+	mDataSetID=
 	((GridPlot*)plotwidget_p)->createDataset(data, umesh_p, vmesh_p, uperiodic_, vperiodic_, append);
 
 	for ( i = 0; i < umesh_p; i++) 
