@@ -24,6 +24,7 @@ int main( int argc, char** argv )
 	EnrichmentMainWindow mainwindow;
 
 	mainwindow.show();
+    mainwindow.plot->updateData();
 
 	return app.exec();
 }

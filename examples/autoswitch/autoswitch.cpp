@@ -90,5 +90,7 @@ int main(int argc, char **argv)
 
     spl->resize(800,400);
     spl->show();
+    plot1->updateData();
+    plot2->updateData();
     return a.exec();
 }

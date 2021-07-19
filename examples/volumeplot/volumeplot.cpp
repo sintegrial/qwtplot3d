@@ -104,5 +104,6 @@ int main(int argc, char **argv)
     Plot plot;
     plot.resize(800,600);
     plot.show();
+    plot.updateData();
     return a.exec();
 }
