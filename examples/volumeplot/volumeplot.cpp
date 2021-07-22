@@ -18,6 +18,10 @@ class Plot : public VolumePlot
 {
 public:
     Plot();
+
+protected:
+    void resizeGL(int width, int height) override;
+    void paintGL() override;
 };
 
 
@@ -96,6 +100,18 @@ Plot::Plot(): VolumePlot()
 
     updateData();
     update();
+}
+
+void Plot::resizeGL(int width, int height)
+{
+    int side = qMin(width, height);
+    glViewport((width - side) / 2, (height - side) / 2, side, side);
+}
+
+void Plot::paintGL()
+{
+    resizeGL(width(), height());
+    Plot3D::paintGL();
 }
 
 int main(int argc, char **argv)
