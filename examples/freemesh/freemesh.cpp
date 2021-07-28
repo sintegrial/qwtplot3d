@@ -176,5 +176,6 @@ int main(int argc, char **argv)
   layout->addWidget(&plot,0,0);
   frame.resize(800,600);
   frame.show();
+  plot.updateData();
   return a.exec();
 }

@@ -23,6 +23,7 @@ int main( int argc, char** argv )
 
 	AxesMainWindow mainwindow;
 	mainwindow.show();
+    mainwindow.plot->updateData();
 
 	return app.exec();
 }

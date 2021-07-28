@@ -24,6 +24,7 @@ int main( int argc, char **argv )
   MeshMainWindow mainwindow;
   mainwindow.resize(1024,768);
 	mainwindow.show();
+    mainwindow.dataWidget->updateData();
 
 	return app.exec();
 }
