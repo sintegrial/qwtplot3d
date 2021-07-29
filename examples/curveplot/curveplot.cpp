@@ -31,9 +31,9 @@ int main(int argc, char **argv)
     }
 
     plot.setPointsOnCurve(ap);
-    plot.updateData();
     plot.resize(800,600);
     plot.show();
+    plot.updateData();
     return a.exec();
 }
 
