@@ -16,7 +16,7 @@ namespace {
 
 typedef double coordinate_type;
 
-int ccw(coordinate_type **P, int i, int j, int k) {
+bool ccw(coordinate_type **P, size_t i, size_t j, size_t k) {
     coordinate_type	a = P[i][0] - P[j][0],
             b = P[i][1] - P[j][1],
             c = P[k][0] - P[j][0],
@@ -40,21 +40,22 @@ int cmpl(const void *a, const void *b) {
 int cmph(const void *a, const void *b) {return cmpl(b,a);}
 
 
-int make_chain(coordinate_type** V, int n, int (*cmp)(const void*, const void*)) {
-    int i, j, s = 1;
+size_t make_chain(coordinate_type** V, size_t const n, int (*cmp)(const void*, const void*)) {
+    size_t s = 1;
     coordinate_type* t;
 
     qsort(V, n, sizeof(coordinate_type*), cmp);
-    for (i=2; i<n; i++) {
-        for (j=s; j>=1 && ccw(V, i, j, j-1); j--){}
+    for (size_t i=2; i<n; i++) {
+        size_t j = s;
+        for (; j>=1 && ccw(V, i, j, j-1); j--){}
         s = j+1;
         t = V[s]; V[s] = V[i]; V[i] = t;
     }
     return s;
 }
 
-int _ch2d(coordinate_type **P, int n)  {
-    int u = make_chain(P, n, cmpl);		/* make lower hull */
+size_t _ch2d(coordinate_type **P, size_t const n)  {
+    size_t u = make_chain(P, n, cmpl);		/* make lower hull */
     if (!n) return 0;
     P[n] = P[0];
     return u+make_chain(P+u, n-u+1, cmph);	/* make upper hull */
@@ -103,7 +104,7 @@ void Qwt3D::convexhull2d( std::vector<unsigned>& idx, const std::vector<Tuple>& 
     }
 
     coordinate_type* start = points[0];
-    int m = _ch2d( points, src.size() );
+    size_t const m = _ch2d( points, src.size() );
     idx.resize(m);
     
     for (i=0; i<m; ++i)
@@ -118,7 +119,7 @@ unsigned Qwt3D::tesselationSize(CellVector const& t)
 {
     unsigned ret = 0;
 
-    for (unsigned i=0; i!=t.size(); ++i)
+    for (size_t i=0; i<t.size(); ++i)
         ret += t[i].size();
 
     return ret;

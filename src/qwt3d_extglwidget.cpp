@@ -183,7 +183,7 @@ void ExtGLWidget::wheelEvent( QWheelEvent *e )
 
     double accel = 0.05;
 
-    double step =  accel * e->delta() / WHEEL_DELTA ;
+    double step =  accel * e->angleDelta().y() / WHEEL_DELTA ;
     step = exp(step)-1;
 
     if ( e->modifiers() & Qt::ShiftModifier )

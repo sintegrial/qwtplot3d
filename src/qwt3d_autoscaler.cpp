@@ -216,7 +216,7 @@ int LinearAutoScaler::execute(double& a, double& b, double start, double stop, i
         }
         else
         {
-            for (unsigned int i=mantissi_.size()-1; i>0; --i)
+            for (size_t i=mantissi_.size()-1; i>0; --i)
             {
                 if (int(c) == mantissi_[i])
                 {

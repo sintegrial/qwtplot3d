@@ -183,12 +183,12 @@ void ColorLegend::draw()
     glEnd();
 
 
-    unsigned size = colors.size();
+    size_t const size = colors.size();
     RGBA rgb;
 
     if (orientation_ == ColorLegend::BottomTop)
     {
-        for (unsigned i=1; i<=size; ++i)
+        for (size_t i=1; i<=size; ++i)
         {
             rgb = colors[i-1];
             glColor4d(rgb.r,rgb.g,rgb.b,rgb.a);
@@ -202,7 +202,7 @@ void ColorLegend::draw()
     }
     else
     {
-        for (unsigned i=1; i<=size; ++i)
+        for (size_t i=1; i<=size; ++i)
         {
             rgb = colors[i-1];
             glColor4d(rgb.r,rgb.g,rgb.b,rgb.a);

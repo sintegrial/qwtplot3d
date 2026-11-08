@@ -173,8 +173,8 @@ void CurvePlot::createOpenGlData(const Plot3D::Plotlet &pl)
     // draw shot lines
     glBegin(GL_LINE_STRIP);
     glColor3f(1.0, 0.0, 0.0);
-    int total = mLinePoints.size();
-    for (int i = 0; i < total; ++i) {
+    size_t const total = mLinePoints.size();
+    for (size_t i = 0; i < total; ++i) {
         Triple tmp(mLinePoints[i]);
         glVertex3f(tmp.x, tmp.y, tmp.z);
     }

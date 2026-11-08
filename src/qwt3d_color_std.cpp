@@ -54,12 +54,12 @@ RGBA StandardColor::rgba(double, double, double z) const
     if (colors_.empty())
         return RGBA(0.0,0.0,0.0);
 
-    unsigned index = 0;
-    double fac = (z - zmin_) / (zmax_-zmin_);
+    size_t index = 0;
+    double const fac = (z - zmin_) / (zmax_-zmin_);
     if (fac<0)
         return RGBA(0.0,0.0,0.0);
 
-    index = unsigned((colors_.size()-1) * fac);
+    index = static_cast<size_t>((colors_.size()-1) * fac);
     if (index >= colors_.size())
         index = colors_.size()-1;
 

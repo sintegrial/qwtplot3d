@@ -7,6 +7,7 @@
 
 #include <QApplication>
 #include <QDebug>
+#include <QFile>
 
 #include <qwt3d_volumeplot.h>
 

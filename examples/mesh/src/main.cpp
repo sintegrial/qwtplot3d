@@ -8,14 +8,18 @@
 #include <qapplication.h>
 #include "meshmainwindow.h"
 
-#include <QGLFormat>
+#include <QtGlobal>
+#include <utilities/hasOpenGL.h>
 
 int main( int argc, char **argv )
 {
-  QApplication::setColorSpec( QApplication::CustomColor );
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    QApplication::setColorSpec( QApplication::CustomColor );
+#endif
+
   QApplication app(argc,argv);
 
-  if ( !QGLFormat::hasOpenGL() )
+  if ( !Qwt3D::hasOpenGL() )
 	{
 		qWarning( "This system has no OpenGL support. Exiting." );
 		return -1;

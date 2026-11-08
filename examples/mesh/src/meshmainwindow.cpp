@@ -1,5 +1,6 @@
 #include <fstream>
 
+#include <QActionGroup>
 #include <QFontDialog>
 #include <QFileDialog>
 #include <QColorDialog>

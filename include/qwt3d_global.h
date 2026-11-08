@@ -2,15 +2,15 @@
 #ifndef qwt3d_global_h__2009_10_11_14_19_14_begin_guarded_code
 #define qwt3d_global_h__2009_10_11_14_19_14_begin_guarded_code
 
-//#include <qglobal.h>
-
 #define QWT3D_MAJOR_VERSION 0
 #define QWT3D_MINOR_VERSION 3
-#define QWT3D_PATCH_VERSION 1
+#define QWT3D_PATCH_VERSION 3
 
 //
 // Create Qwt3d DLL if QWT3D_DLL is defined (Windows only)
 //
+
+#include <QtGlobal>
 
 #if defined(Q_OS_WIN)
   #if defined(_MSC_VER) /* MSVC Compiler */
