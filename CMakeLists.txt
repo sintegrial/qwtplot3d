@@ -62,6 +62,13 @@ target_link_libraries(${PROJECT_NAME}
         OpenGL::GLU
 )
 
+if (WIN32)
+    target_compile_options(${PROJECT_NAME}
+        PRIVATE
+            -MP -fp:fast -arch:SSE2
+    )
+endif()
+
 # Only add the examples if this is the top-level CMake project.
 if(${CMAKE_SOURCE_DIR} STREQUAL ${PROJECT_SOURCE_DIR})
   add_subdirectory( examples )
