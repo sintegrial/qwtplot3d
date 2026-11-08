@@ -91,7 +91,6 @@ void LinearScale::calculate()
     double interval = mstop_p-mstart_p;
 
     double runningval;
-    int i=0;
 
     // majors
 
@@ -102,7 +101,7 @@ void LinearScale::calculate()
     majors_p.push_back(mstart_p);
 
     // remaining tics
-    for (i = 1; i <= majorintervals_p; ++i)
+    for (size_t i = 1; i <= majorintervals_p; ++i)
     {
         double t = double(i) / majorintervals_p;
         runningval = mstart_p + t * interval;
@@ -142,7 +141,7 @@ void LinearScale::calculate()
     //       mstart_p            mstop_p
     //  ________|_____ _ _ _ _ _ ___|__________
 
-    for (i=0; i!=majorintervals_p; ++i)
+    for (size_t i=0; i!=majorintervals_p; ++i)
     {
         runningval = majors_p[i] + step;
         for (int j=0; j!=minorintervals_p; ++j)
@@ -245,7 +244,7 @@ void LogScale::calculate()
     //       mstart_p            mstop_p
     //  ________|_____ _ _ _ _ _ ___|__________
 
-    for (int i=0; i!=majorintervals_p; ++i)
+    for (size_t i=0; i!=majorintervals_p; ++i)
     {
         setupCounter(k,step);
         runningval = log10(k)+(majors_p[i]);

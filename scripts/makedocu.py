@@ -1,17 +1,13 @@
 import os.path
-import shutil
-import tarfile
-import zlib
 import zipfile
-from time import gmtime, strftime
 
 refuseddirs = ['CVS','images']
 refuseddirsextra = ['CVS','small']
 
-source = 'V:\\\\cvs\\qwtplot3d\\doc\\'
-sourceim = 'V:\\\\cvs\\qwtplot3d\\doc\\images\\'
-zipname = 'V:\\\\cvs\\uploads\\qwtplot3d-doc.zip'
-zipextraname = 'V:\\\\cvs\\uploads\\qwtplot3d-doc-extra.zip'
+source = 'V://cvs/qwtplot3d/doc/'
+sourceim = 'V://cvs/qwtplot3d/doc/images/'
+zipname = 'V://cvs/uploads/qwtplot3d-doc.zip'
+zipextraname = 'V://cvs/uploads/qwtplot3d-doc-extra.zip'
 
 def compresstree(src, zip, refdir):
     names = os.listdir(src)
@@ -22,9 +18,9 @@ def compresstree(src, zip, refdir):
             if name not in refdir:
                 compresstree(srcname, zip, refdir)
             if name == 'images':    
-                compresstree(srcname +'\\small', zip, refdir)
+                compresstree(srcname +'/small', zip, refdir)
         else:
-            zip.write(srcname,'qwtplot3d\\doc\\' +  srcname[len(source):])
+            zip.write(srcname,'qwtplot3d/doc/' +  srcname[len(source):])
                 
 
 
