@@ -1,7 +1,5 @@
 import os.path
-import shutil
 import tarfile
-import zlib
 import zipfile
 from time import gmtime, strftime
 
@@ -25,15 +23,15 @@ zipname = 'V:\\\\cvs\\uploads\\' + tstr + 'plot3d.zip'
 
 def dos2unix(filename):
     if os.path.isdir(filename):
-        print filename, "Directory!"
+        print(f"{filename} Directory!")
         return
     data = open(filename, "rb").read()
-    if '\0' in data:
-        print filename, "Binary!"
+    if b'\0' in data:
+        print(f"{filename} Binary!")
         return
-    newdata = data.replace("\r\n", "\n")
+    newdata = data.replace(b"\r\n", b"\n")
     if newdata != data:
-        print filename
+        print(filename)
         f = open(filename, "wb")
         f.write(newdata)
         f.close()
