@@ -4,6 +4,8 @@
 
 #include "qwt3d_types.h"
 
+#include <QOpenGLWidget>
+
 class QMouseEvent;
 class QWheelEvent;
 class QKeyEvent;
