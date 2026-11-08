@@ -8,11 +8,15 @@
 #include <qapplication.h>
 #include "mainwindow.h"
 
+#include <QtGlobal>
 #include <utilities/hasOpenGL.h>
 
 int main( int argc, char **argv )
 {
-  QApplication::setColorSpec( QApplication::CustomColor );
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    QApplication::setColorSpec( QApplication::CustomColor );
+#endif
+
   QApplication app(argc,argv);
 
   if ( !Qwt3D::hasOpenGL() )
