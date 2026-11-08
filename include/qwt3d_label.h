@@ -2,13 +2,11 @@
 #ifndef qwt3d_label_h__2009_10_11_14_22_08_begin_guarded_code
 #define qwt3d_label_h__2009_10_11_14_22_08_begin_guarded_code
 
-//#include <qpixmap.h>
-//#include <qimage.h>
-//#include <qfont.h>
-//#include <qpainter.h>
-//#include <qfontmetrics.h>
-
 #include "qwt3d_drawable.h"
+
+#include <QFont>
+#include <QImage>
+#include <QString>
 
 namespace Qwt3D
 {

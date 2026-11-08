@@ -6,13 +6,13 @@
   #pragma warning ( disable : 4786 )
 #endif
 
-#include <string>
-
 #include <QtGlobal>
+#include <QColor>
+
 #include <math.h>
 #include <cmath>
 #define IS_NAN(x) std::isnan(x)
-
+#include <string>
 
 #include "qwt3d_portability.h"
 #include "qwt3d_helper.h"
