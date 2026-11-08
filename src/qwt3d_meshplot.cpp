@@ -103,11 +103,11 @@ void MeshPlot::isolines2Floor(const Plotlet& pl)
         if (val > data.hull().maxVertex.z || val < data.hull().minVertex.z)
             continue;
 
-        for (unsigned i=0; i!=data.cells.size(); ++i)
+        for (size_t i=0; i!=data.cells.size(); ++i)
         {
             nodes.clear();
-            unsigned cellnodes = data.cells[i].size();
-            for (unsigned j=0; j!=cellnodes; ++j)
+            size_t const cellnodes = data.cells[i].size();
+            for (size_t j=0; j!=cellnodes; ++j)
             {
                 nodes.push_back(data.nodes[data.cells[i][j]]);
             }
@@ -193,11 +193,9 @@ int MeshPlot::createDataset(TripleVector const& data, CellVector const& poly, bo
     plotdata.cells = poly;
     plotdata.normals = TripleVector(plotdata.nodes.size());
 
-    unsigned i;
-
     //  normals for the moment
     Triple n, u, v;
-    for ( i = 0; i < poly.size(); ++i)
+    for (size_t i = 0; i < poly.size(); ++i)
     {
         if (poly[i].size() < 3)
             n = Triple(0,0,0);
@@ -205,8 +203,8 @@ int MeshPlot::createDataset(TripleVector const& data, CellVector const& poly, bo
         {
             for (unsigned j = 0; j < poly[i].size(); ++j)
             {
-                unsigned jj = (j+1) % poly[i].size();
-                unsigned pjj = (j) ? j-1 : poly[i].size()-1;
+                size_t const jj = (j+1) % poly[i].size();
+                size_t const pjj = (j) ? j-1 : poly[i].size()-1;
                 u = plotdata.nodes[poly[i][jj]]-plotdata.nodes[poly[i][j]];
                 v = plotdata.nodes[poly[i][pjj]]-plotdata.nodes[poly[i][j]];
                 n = normalizedcross(u,v);
@@ -214,7 +212,7 @@ int MeshPlot::createDataset(TripleVector const& data, CellVector const& poly, bo
             }
         }
     }
-    for ( i = 0; i != plotdata.normals.size(); ++i)
+    for (size_t i = 0; i < plotdata.normals.size(); ++i)
     {
         plotdata.normals[i].normalize();
     }

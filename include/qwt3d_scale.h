@@ -48,7 +48,7 @@ class QWT3D_EXPORT Scale
 
     std::vector<double> majors_p, minors_p; 
     double start_p, stop_p;
-    int majorintervals_p, minorintervals_p;
+    size_t majorintervals_p, minorintervals_p;
     double mstart_p, mstop_p;
 };
 
