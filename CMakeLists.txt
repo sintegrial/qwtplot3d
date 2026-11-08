@@ -6,8 +6,8 @@ project(qwtplot3d-zjk
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
+# Automatically execute the Qt Meta-Object Compiler (moc) when required.
 set(CMAKE_AUTOMOC ON)
-# Create code from a list of Qt designer ui files
 
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 find_package(Qt5 COMPONENTS Core REQUIRED)
