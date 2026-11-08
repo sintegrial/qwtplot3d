@@ -27,7 +27,7 @@ find_package(OpenGL REQUIRED
 
 
 file(GLOB SOURCES "src/*.cpp" "include/*.h")
-add_library(${PROJECT_NAME} SHARED
+add_library(${PROJECT_NAME}
     ${SOURCES}
 )
 
