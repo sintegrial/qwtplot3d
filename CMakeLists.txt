@@ -61,3 +61,8 @@ target_link_libraries(${PROJECT_NAME}
         OpenGL::GL
         OpenGL::GLU
 )
+
+# Only add the examples if this is the top-level CMake project.
+if(${CMAKE_SOURCE_DIR} STREQUAL ${PROJECT_SOURCE_DIR})
+  add_subdirectory( examples )
+endif()
