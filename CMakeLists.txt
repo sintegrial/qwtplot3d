@@ -23,12 +23,14 @@ add_library(${PROJECT_NAME} SHARED ${SOURCES})
 
 
 target_link_libraries(${PROJECT_NAME}
-    Qt5::Core
-    Qt5::Gui
-    Qt5::Widgets
+    PUBLIC
+        Qt5::Core
+        Qt5::Gui
+        Qt5::Widgets
 )
 
 target_link_libraries(${PROJECT_NAME}
-    OpenGL::GL
-    OpenGL::GLU
+    PUBLIC
+        OpenGL::GL
+        OpenGL::GLU
 )
