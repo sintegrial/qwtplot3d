@@ -13,6 +13,9 @@ find_package(Qt5 COMPONENTS Widgets REQUIRED)
 find_package(Qt5 COMPONENTS Core REQUIRED)
 find_package(Qt5 COMPONENTS Gui REQUIRED)
 
+find_package(OpenGL COMPONENTS OpenGL REQUIRED)
+
+
 file(GLOB SOURCES "src/*.cpp" "include/*.h")
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
 
@@ -20,8 +23,5 @@ add_library(${PROJECT_NAME} SHARED ${SOURCES})
 target_link_libraries(${PROJECT_NAME} Qt5::Core)
 target_link_libraries(${PROJECT_NAME} Qt5::Gui)
 target_link_libraries(${PROJECT_NAME} Qt5::Widgets)
-
-
-find_package(OpenGL COMPONENTS OpenGL REQUIRED)
 
 target_link_libraries(${PROJECT_NAME} OpenGL::GL OpenGL::GLU)
