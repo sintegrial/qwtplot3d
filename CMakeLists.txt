@@ -62,18 +62,16 @@ target_link_libraries(${PROJECT_NAME}
         OpenGL::GLU
 )
 
-if(WIN32)
-    if(MSVC)
-        target_compile_options(${PROJECT_NAME}
-            PRIVATE
-                -fp:fast -arch:SSE2
-        )
-    else()
-        target_compile_options(${PROJECT_NAME}
-            PRIVATE
-                -ffast-math -msse2
-        )
-    endif()
+if(MSVC)
+    target_compile_options(${PROJECT_NAME}
+        PRIVATE
+            -fp:fast -arch:SSE2
+    )
+else()
+    target_compile_options(${PROJECT_NAME}
+        PRIVATE
+            -ffast-math -msse2
+    )
 endif()
 
 # Only add the examples if this is the top-level CMake project.
