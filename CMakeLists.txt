@@ -22,8 +22,13 @@ file(GLOB SOURCES "src/*.cpp" "include/*.h")
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
 
 
-target_link_libraries(${PROJECT_NAME} Qt5::Core)
-target_link_libraries(${PROJECT_NAME} Qt5::Gui)
-target_link_libraries(${PROJECT_NAME} Qt5::Widgets)
+target_link_libraries(${PROJECT_NAME}
+    Qt5::Core
+    Qt5::Gui
+    Qt5::Widgets
+)
 
-target_link_libraries(${PROJECT_NAME} OpenGL::GL OpenGL::GLU)
+target_link_libraries(${PROJECT_NAME}
+    OpenGL::GL
+    OpenGL::GLU
+)
