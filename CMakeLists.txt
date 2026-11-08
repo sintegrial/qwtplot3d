@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.1.0)
 
 project(qwtplot3d
+    VERSION 0.3.3
     LANGUAGES CXX
 )
 
