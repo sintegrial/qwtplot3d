@@ -9,11 +9,13 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 # Automatically execute the Qt Meta-Object Compiler (moc) when required.
 set(CMAKE_AUTOMOC ON)
 
-find_package(Qt5 COMPONENTS Widgets REQUIRED)
-find_package(Qt5 COMPONENTS Core REQUIRED)
-find_package(Qt5 COMPONENTS Gui REQUIRED)
+find_package(Qt5 REQUIRED
+    COMPONENTS Widgets Core Gui
+)
 
-find_package(OpenGL COMPONENTS OpenGL REQUIRED)
+find_package(OpenGL REQUIRED
+    COMPONENTS OpenGL
+)
 
 
 file(GLOB SOURCES "src/*.cpp" "include/*.h")
