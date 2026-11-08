@@ -4,8 +4,6 @@ project(qwtplot3d
     LANGUAGES CXX
 )
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-
 # Automatically execute the Qt Meta-Object Compiler (moc) when required.
 set(CMAKE_AUTOMOC ON)
 
@@ -31,6 +29,11 @@ find_package(OpenGL REQUIRED
 file(GLOB SOURCES "src/*.cpp" "include/*.h")
 add_library(${PROJECT_NAME} SHARED
     ${SOURCES}
+)
+
+target_include_directories(${PROJECT_NAME}
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
 
