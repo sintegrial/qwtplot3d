@@ -10,6 +10,7 @@ add_executable(mesh
 )
 
 target_link_libraries(mesh PRIVATE
+    qwtplot3dExamplesUtilities
     qwtplot3d
     Qt${QT_VERSION_MAJOR}::Widgets
 )

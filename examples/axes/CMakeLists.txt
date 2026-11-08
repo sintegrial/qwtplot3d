@@ -6,6 +6,7 @@ add_executable(axes
 )
 
 target_link_libraries(axes PRIVATE
+    qwtplot3dExamplesUtilities
     qwtplot3d
     Qt${QT_VERSION_MAJOR}::Widgets
 )

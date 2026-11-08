@@ -6,6 +6,7 @@ add_executable(enrichments
 )
 
 target_link_libraries(enrichments PRIVATE
+    qwtplot3dExamplesUtilities
     qwtplot3d
     Qt${QT_VERSION_MAJOR}::Widgets
 )

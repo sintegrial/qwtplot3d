@@ -4,6 +4,8 @@ set(CMAKE_AUTORCC ON)
 set(RC_ICON "${CMAKE_CURRENT_SOURCE_DIR}/icon.rc")
 set(QRC_IMAGES "${CMAKE_CURRENT_SOURCE_DIR}/images.qrc")
 
+add_subdirectory(utilities)
+
 add_subdirectory(autoswitch)
 add_subdirectory(axes)
 add_subdirectory(curveplot)

@@ -8,6 +8,7 @@ add_executable(plotlets
 )
 
 target_link_libraries(plotlets PRIVATE
+    qwtplot3dExamplesUtilities
     qwtplot3d
     Qt${QT_VERSION_MAJOR}::Widgets
 )
