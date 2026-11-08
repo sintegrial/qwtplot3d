@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.1.0)
-enable_language(CXX)
 
 project(qwtplot3d-zjk)
+
+enable_language(CXX)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
