@@ -2,11 +2,7 @@
 #ifndef qwt3d_openglhelper_h__2009_10_11_14_23_25_begin_guarded_code
 #define qwt3d_openglhelper_h__2009_10_11_14_23_25_begin_guarded_code
 
-#if QT_VERSION < QT_VERSION_CHECK(6, 5, 0)
 #include <QtGlobal>
-#else
-#include <QtSystemDetection>
-#endif
 
 #ifdef Q_OS_MAC
 #include <OpenGL/glu.h>

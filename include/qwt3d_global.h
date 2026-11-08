@@ -10,11 +10,7 @@
 // Create Qwt3d DLL if QWT3D_DLL is defined (Windows only)
 //
 
-#if QT_VERSION < QT_VERSION_CHECK(6, 5, 0)
 #include <QtGlobal>
-#else
-#include <QtSystemDetection>
-#endif
 
 #if defined(Q_OS_WIN)
   #if defined(_MSC_VER) /* MSVC Compiler */

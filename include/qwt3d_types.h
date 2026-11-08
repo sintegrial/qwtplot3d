@@ -6,7 +6,6 @@
   #pragma warning ( disable : 4786 )
 #endif
 
-#include <QtGlobal>
 #include <QColor>
 
 #include <math.h>
